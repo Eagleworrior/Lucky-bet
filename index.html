@@ -16,7 +16,7 @@
                     colors: { 
                         luckyGreen: '#00ff66',
                         luckyDark: '#050811',
-                        panelBg:-[#0d1527],
+                        panelBg: '#0d1527',
                         borderBg: '#1e293b',
                         oddsBg: '#141f36',
                         liveRed: '#ff3b30',
@@ -94,7 +94,7 @@
             <div class="pt-4 border-t border-slate-800/60 text-xs space-y-2.5">
                 <h3 class="text-slate-500 font-bold uppercase tracking-wider px-3">System Specifications</h3>
                 <div class="bg-[#0d1527] border border-slate-800/80 p-3 rounded-xl space-y-1.5 text-[11px] text-slate-400">
-                    <div class="flex justify-between"><span>Data Delivery</span><span class="text-luckyGreen font-bold">API Production</span></div>
+                    <div class="flex justify-between"><span>Data Delivery</span><span class="text-luckyGreen font-bold">Live API Synced</span></div>
                     <div class="flex justify-between"><span>Security Vault</span><span class="text-luckyGreen font-bold">SSL Encrypted</span></div>
                 </div>
             </div>
@@ -128,7 +128,10 @@
 
             <!-- Odds Interactive View Target -->
             <div class="space-y-3" id="odds-matrix-view">
-                <!-- Matches are dynamically built here based on timeframes and leagues selection -->
+                <!-- Data-Engine injects games here asynchronously -->
+                <div class="text-center py-12 text-slate-500 text-xs font-bold tracking-widest uppercase animate-pulse">
+                    Connecting to live odds network stream...
+                </div>
             </div>
         </main>
 
@@ -209,7 +212,7 @@
 
     <!-- Interactive Sports Data Parsing Engine Script -->
     <script>
-        // Set this API route string to match your backend operational platform pipeline environment
+        // Point this to your backend operational pipeline server
         const ENGINE_API_ROUTE = 'http://localhost:3000/api';
         const PAYSTACK_PUBLIC_LIVE_KEY = 'pk_live_27d2699bf73e5b924f911ce6d2ba876a7657d1bd';
         
@@ -217,110 +220,14 @@
         let currentActiveTimeframe = 'live';
         let currentSelectedLeague = 'all';
         let localActiveSlip = null;
-        let systemLiquidBalanceCents = 500000; // Baseline tracking wallet capital layout: KES 5,000.00
-
-        // Comprehensive Global Sports Database Grid (Simultaneously feeds all tabs automatically)
-        const productionSportsBookData = [
-            // TIMEFRAME STATE 1: LIVE NOW IN-PLAY CHANNELS
-            {
-                id: "m_live_01",
-                timeframe: "live",
-                league: "English Premier League",
-                home_team: "Manchester City",
-                away_team: "Liverpool FC",
-                status: "74' LIVE",
-                score: "3 - 2",
-                choices: [{ id: "opt_m1_1", name: "Man City", odds: 1.35 }, { id: "opt_m1_x", name: "Draw", odds: 4.20 }, { id: "opt_m1_2", name: "Liverpool", odds: 6.80 }]
-            },
-            {
-                id: "m_live_02",
-                timeframe: "live",
-                league: "La Liga",
-                home_team: "Real Madrid",
-                away_team: "FC Barcelona",
-                status: "31' LIVE",
-                score: "1 - 1",
-                choices: [{ id: "opt_m2_1", name: "Real Madrid", odds: 2.05 }, { id: "opt_m2_x", name: "Draw", odds: 3.25 }, { id: "opt_m2_2", name: "Barcelona", odds: 2.90 }]
-            },
-            {
-                id: "m_live_03",
-                timeframe: "live",
-                league: "Serie A",
-                home_team: "Juventus JK",
-                away_team: "AC Milan",
-                status: "89' LIVE",
-                score: "0 - 1",
-                choices: [{ id: "opt_m3_1", name: "Juventus", odds: 14.00 }, { id: "opt_m3_x", name: "Draw", odds: 5.50 }, { id: "opt_m3_2", name: "AC Milan", odds: 1.08 }]
-            },
-
-            // TIMEFRAME STATE 2: UPCOMING TARGET FIXTURES (TODAY / TOMORROW)
-            {
-                id: "m_up_01",
-                timeframe: "upcoming",
-                league: "English Premier League",
-                home_team: "Arsenal FC",
-                away_team: "Manchester United",
-                status: "Today 22:00",
-                score: "vs",
-                choices: [{ id: "opt_m4_1", name: "Arsenal", odds: 1.90 }, { id: "opt_m4_x", name: "Draw", odds: 3.60 }, { id: "opt_m4_2", name: "Man United", odds: 3.40 }]
-            },
-            {
-                id: "m_up_02",
-                timeframe: "upcoming",
-                league: "UEFA Champions League",
-                home_team: "Bayern Munich",
-                away_team: "Paris Saint-Germain",
-                status: "Tomorrow 21:45",
-                score: "vs",
-                choices: [{ id: "opt_m5_1", name: "Bayern", odds: 1.72 }, { id: "opt_m5_x", name: "Draw", odds: 4.00 }, { id: "opt_m5_2", name: "PSG", odds: 4.25 }]
-            },
-            {
-                id: "m_up_03",
-                timeframe: "upcoming",
-                league: "La Liga",
-                home_team: "Atletico Madrid",
-                away_team: "Sevilla FC",
-                status: "May 31, 18:00",
-                score: "vs",
-                choices: [{ id: "opt_m6_1", name: "Atletico", odds: 1.55 }, { id: "opt_m6_x", name: "Draw", odds: 3.85 }, { id: "opt_m6_2", name: "Sevilla", odds: 5.50 }]
-            },
-
-            // TIMEFRAME STATE 3: PAST COMPLETED HISTORICAL ARCHIVES (PLAYED 14 DAYS AGO RANGE)
-            {
-                id: "m_res_01",
-                timeframe: "results",
-                league: "English Premier League",
-                home_team: "Chelsea FC",
-                away_team: "Newcastle United",
-                status: "FT (14 Days Ago)",
-                score: "4 - 2",
-                choices: [{ id: "opt_m7_1", name: "Chelsea (Won)", odds: 2.10 }, { id: "opt_m7_x", name: "Draw", odds: 3.40 }, { id: "opt_m7_2", name: "Newcastle", odds: 3.15 }]
-            },
-            {
-                id: "m_res_02",
-                timeframe: "results",
-                league: "Serie A",
-                home_team: "Inter Milan",
-                away_team: "Lazio Roma",
-                status: "FT (10 Days Ago)",
-                score: "3 - 0",
-                choices: [{ id: "opt_m8_1", name: "Inter (Won)", odds: 1.45 }, { id: "opt_m8_x", name: "Draw", odds: 4.30 }, { id: "opt_m8_2", name: "Lazio", odds: 6.50 }]
-            },
-            {
-                id: "m_res_03",
-                timeframe: "results",
-                league: "UEFA Champions League",
-                home_team: "Borussia Dortmund",
-                away_team: "Real Madrid",
-                status: "FT (May 15, 2026)",
-                score: "1 - 2",
-                choices: [{ id: "opt_m9_1", name: "Dortmund", odds: 3.50 }, { id: "opt_m9_x", name: "Draw", odds: 3.75 }, { id: "opt_m9_2", name: "R. Madrid (Won)", odds: 1.91 }]
-            }
-        ];
+        let systemLiquidBalanceCents = 500000; // Wallet Balance tracking
 
         document.addEventListener('DOMContentLoaded', () => {
             updateBalanceUI();
-            refreshLiveMatrix();
+            fetchAndRenderLiveMatrix();
+            
+            // Production Auto-polling: Refresh odds matrix every 30 seconds automatically
+            setInterval(fetchAndRenderLiveMatrix, 30000);
         });
 
         function updateBalanceUI() {
@@ -356,7 +263,7 @@
                 rightHeader.className = "col-span-6 grid grid-cols-3 text-center text-slate-400 font-bold";
             }
 
-            refreshLiveMatrix();
+            fetchAndRenderLiveMatrix();
         }
 
         function filterByLeague(leagueName) {
@@ -366,36 +273,37 @@
                 btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left";
             }
             event.currentTarget.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#0d1527] text-white font-bold text-xs border border-slate-800 transition text-left shadow-sm";
-            refreshLiveMatrix();
+            fetchAndRenderLiveMatrix();
         }
 
-        // Polls the central repository array matrices or hits production backend servers
-        async function refreshLiveMatrix() {
+        // HITS BACKEND SERVER TO PULL REAL GAME DATA STREAMS
+        async function fetchAndRenderLiveMatrix() {
+            const container = document.getElementById('odds-matrix-view');
             try {
-                const response = await fetch(`${ENGINE_API_ROUTE}/matches`);
-                if (!response.ok) throw new Error('Redirecting execution loop to local network cluster data blocks.');
-                const corePayload = await response.json();
-                renderSportsBookMatrix(corePayload);
+                // Requests data with parameterized filtering straight to backend query routes
+                const response = await fetch(`${ENGINE_API_ROUTE}/matches?timeframe=${currentActiveTimeframe}&league=${currentSelectedLeague}`);
+                if (!response.ok) throw new Error('API pipeline data mismatch or server offline.');
+                
+                const realGamesPayload = await response.json();
+                renderSportsBookMatrix(realGamesPayload);
             } catch (err) {
-                // Instant seamless deployment injection for static host instances (GitHub Pages execution safe)
-                renderSportsBookMatrix(productionSportsBookData);
+                container.innerHTML = `
+                    <div class="text-center bg-[#0d1527]/60 border border-red-950/40 rounded-2xl py-14 text-slate-400 text-xs font-semibold p-6">
+                        <div class="text-xl mb-2">📡</div>
+                        <p class="text-red-400 font-bold">API Connection Interrupted</p>
+                        <p class="text-slate-500 font-normal mt-1 text-[11px]">Verify your backend node execution server layer is running online at <code class="bg-[#050811] text-luckyGreen px-1.5 py-0.5 rounded border border-slate-800">${ENGINE_API_ROUTE}/matches</code>.</p>
+                    </div>`;
             }
         }
 
-        function renderSportsBookMatrix(dataset) {
+        function renderSportsBookMatrix(computationalList) {
             const container = document.getElementById('odds-matrix-view');
             container.innerHTML = '';
 
-            const computationalList = dataset.filter(game => {
-                const stepTimeframe = game.timeframe === currentActiveTimeframe;
-                const stepLeague = currentSelectedLeague === 'all' || game.league === currentSelectedLeague;
-                return stepTimeframe && stepLeague;
-            });
-
-            if (computationalList.length === 0) {
+            if (!computationalList || computationalList.length === 0) {
                 container.innerHTML = `
                     <div class="text-center bg-[#0d1527] border border-slate-800/50 rounded-2xl py-14 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                        No games currently recorded under this league parameter set.
+                        No games currently streamed under these active parameters.
                     </div>`;
                 return;
             }
@@ -531,11 +439,7 @@
                     alert(`Wager Core Exception: ${data.error}`);
                 }
             } catch (err) {
-                // Clean structural tracking fallbacks ensuring static page operations (like GitHub pages) calculate states elegantly
-                systemLiquidBalanceCents -= stakeCents;
-                updateBalanceUI();
-                alert(`✓ Wager Processed Successfully!\n[Platform Engine Sync Complete]: Local tracking balances modified.\nAvailable Balance: KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`);
-                purgeSlipState();
+                alert('Database Error: Unable to sync wager to backend server.');
             }
         }
 
