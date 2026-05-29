@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaziAI — Work done. Locally smart.</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Vector Graphics -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #EEF2F6;
+        }
+        .text-gradient-primary {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #4338CA, #7E22CE);
+        }
+        .text-gradient-emerald {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #047857, #10B981);
+        }
+        .text-gradient-amber {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #B45309, #F59E0B);
+        }
+        .colorful-input {
+            color: #312E81;
+            border-color: #C7D2FE;
+            background-color: #F5F3FF;
+        }
+        .colorful-input:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col text-indigo-950 select-none">
+
+    <!-- ========================================== -->
+    <!-- AUTHENTICATION GATEWAY -->
+    <!-- ========================================== -->
+    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 px-4 transition-all duration-500">
+        <div class="bg-white/95 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border border-indigo-200/50 flex flex-col justify-between">
+            <div>
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white text-3xl font-black shadow-lg mb-4">
+                        <i class="fa-solid fa-bolt-lightning animate-pulse"></i>
+                    </div>
+                    <h1 class="text-4xl font-extrabold text-gradient-primary tracking-tight">KaziAI</h1>
+                    <p class="font-bold text-amber-600 mt-2 text-sm uppercase tracking-wider" id="auth-tagline">Work done. Locally smart.</p>
+                </div>
+
+                <form id="auth-form" onsubmit="executeAuthentication(event)" class="space-y-4">
+                    <div id="field-biz-name">
+                        <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider mb-1">Company Name</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-store absolute left-3 top-3.5 text-indigo-400"></i>
+                            <input type="text" id="auth-biz" class="w-full pl-10 pr-4 py-3 rounded-xl border outline-none font-semibold colorful-input" placeholder="e.g., Thika Tech Hub">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider mb-1">Email Address</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-indigo-400"></i>
+                            <input type="email" id="auth-email" required class="w-full pl-10 pr-4 py-3 rounded-xl border outline-none font-semibold colorful-input" placeholder="manager@company.co.ke">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider mb-1">Secure Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-3 top-3.5 text-indigo-400"></i>
+                            <input type="password" id="auth-pass" required class="w-full pl-10 pr-4 py-3 rounded-xl border outline-none font-semibold colorful-input" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div id="auth-error-msg" class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs font-bold hidden">
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i> Authentication mismatch. Please try again.
+                    </div>
+
+                    <button type="submit" id="btn-auth-submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-transform transform active:scale-95 text-sm uppercase tracking-wider mt-2">
+                        Initialize Core Account
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-8 text-center border-t border-indigo-100 pt-4">
+                <button onclick="switchAuthMode()" id="btn-auth-toggle" class="text-xs font-black text-purple-700 hover:text-purple-900 transition-colors uppercase tracking-wider">
+                    Already registered? Access Workspace Here
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PLATFORM MAIN APPLICATION CONTAINER -->
+    <!-- ========================================== -->
+    <div id="app-screen" class="w-full h-full flex hidden opacity-0 transition-opacity duration-500 overflow-hidden">
+        
+        <!-- SIDEBAR NAVIGATION PANEL -->
+        <aside class="w-72 bg-white border-r border-indigo-100 flex flex-col h-full shadow-xl z-20">
+            <div class="p-6 border-b border-indigo-50 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-black text-gradient-primary tracking-tight"><i class="fa-solid fa-bolt-lightning mr-2"></i>KaziAI</h1>
+                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-0.5" id="nav-sub-brand">Enterprise Dashboard</p>
+                </div>
+                <span class="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-black rounded-md border border-purple-200">v1.2</span>
+            </div>
+            
+            <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto no-scrollbar">
+                <button onclick="navigateToView('dashboard')" id="nav-dashboard" class="w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-900 border-l-4 border-indigo-600">
+                    <div class="flex items-center"><i class="fa-solid fa-chart-pie mr-3 text-indigo-600 text-lg"></i><span data-localize="menu_dash">Dashboard Overview</span></div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-50"></i>
+                </button>
+                <button onclick="navigateToView('workspace')" id="nav-workspace" class="w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all text-indigo-700 hover:bg-indigo-50/50">
+                    <div class="flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-3 text-purple-600 text-lg"></i><span data-localize="menu_work">AI Draft Workspace</span></div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-0"></i>
+                </button>
+                <button onclick="navigateToView('marketplace')" id="nav-marketplace" class="w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all text-indigo-700 hover:bg-indigo-50/50">
+                    <div class="flex items-center"><i class="fa-solid fa-user-tie mr-3 text-emerald-600 text-lg"></i><span data-localize="menu_market">Expert Verification</span></div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-0"></i>
+                </button>
+                <button onclick="navigateToView('whatsapp')" id="nav-whatsapp" class="w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all text-indigo-700 hover:bg-indigo-50/50">
+                    <div class="flex items-center"><i class="fa-brands fa-whatsapp mr-3 text-teal-600 text-lg"></i><span data-localize="menu_wa">WhatsApp Delivery</span></div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-0"></i>
+                </button>
+            </nav>
+
+            <!-- PROFILE & UTILITIES FRAME -->
+            <div class="p-4 border-t border-indigo-100 bg-indigo-50/40 space-y-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-md">
+                        <i class="fa-solid fa-building-user"></i>
+                    </div>
+                    <div class="truncate">
+                        <p class="text-xs font-black text-indigo-500 uppercase tracking-wider" data-localize="lbl_active_profile">Active System Entity</p>
+                        <p class="text-sm font-extrabold text-indigo-900 truncate" id="user-display-title">Enterprise Node</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="toggleSystemLanguage()" class="py-2 px-3 bg-white border border-indigo-200 rounded-lg text-xs font-black text-indigo-700 hover:bg-indigo-50 transition-colors flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-globe text-purple-600"></i>
+                        <span id="lang-btn-txt">Swahili</span>
+                    </button>
+                    <button onclick="terminateSession()" class="py-2 px-3 bg-rose-50 border border-rose-200 rounded-lg text-xs font-black text-rose-700 hover:bg-rose-100 transition-colors flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-power-off"></i>
+                        <span data-localize="btn_exit">Exit</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW WRAPPER -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-gradient-to-tr from-slate-50 to-indigo-50/40">
+            
+            <!-- GLOBAL APP TOP HEADER -->
+            <header class="h-20 bg-white border-b border-indigo-100 px-8 flex justify-between items-center z-10 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-black text-indigo-950" id="header-main-title" data-localize="welcome_msg">Operational Command Engine</h2>
+                    <p class="text-xs font-bold text-indigo-500" id="header-sub-title" data-localize="welcome_sub">Real-time optimization metrics and automation channels.</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-xl flex items-center space-x-3">
+                        <i class="fa-solid fa-wallet text-emerald-600 text-lg"></i>
+                        <div>
+                            <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest" data-localize="lbl_wallet">Wallet Settlement</p>
+                            <p class="text-sm font-black text-indigo-900" id="wallet-balance">KES 14,850</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ========================================== -->
+            <!-- VIEW: DASHBOARD OVERVIEW -->
+            <!-- ========================================== -->
+            <section id="view-dashboard" class="flex-1 p-8 overflow-y-auto space-y-8 app-view-panel">
+                
+                <!-- KEY METRIC DATA CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex items-center space-x-4 relative overflow-hidden group">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-xl font-bold"><i class="fa-solid fa-layer-group"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider" data-localize="card_total_jobs">Total Jobs Instantiated</p>
+                            <h3 class="text-2xl font-black text-indigo-950 mt-0.5" id="stat-total-jobs">37</h3>
+                        </div>
+                        <div class="absolute right-0 bottom-0 translate-x-3 translate-y-3 opacity-5 text-6xl text-indigo-900"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex items-center space-x-4 relative overflow-hidden">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-xl font-bold"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-purple-500 uppercase tracking-wider" data-localize="card_ai_drafts">AI Pipeline Generatives</p>
+                            <h3 class="text-2xl font-black text-purple-950 mt-0.5">142</h3>
+                        </div>
+                        <div class="absolute right-0 bottom-0 translate-x-3 translate-y-3 opacity-5 text-6xl text-purple-900"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex items-center space-x-4 relative overflow-hidden">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl font-bold"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider" data-localize="card_hours">Resource Window Saved</p>
+                            <h3 class="text-2xl font-black text-emerald-950 mt-0.5">84.5 Hrs</h3>
+                        </div>
+                        <div class="absolute right-0 bottom-0 translate-x-3 translate-y-3 opacity-5 text-6xl text-emerald-900"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex items-center space-x-4 relative overflow-hidden">
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-xl font-bold"><i class="fa-solid fa-chart-line"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-amber-500 uppercase tracking-wider" data-localize="card_lift">Conversion Vector Lift</p>
+                            <h3 class="text-2xl font-black text-gradient-amber mt-0.5">+24.8%</h3>
+                        </div>
+                        <div class="absolute right-0 bottom-0 translate-x-3 translate-y-3 opacity-5 text-6xl text-amber-900"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS VISUALIZATION BLOCK -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm lg:col-span-2 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-black text-indigo-950 text-base" data-localize="chart_title">System Production & Volume Performance</h3>
+                            <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md">Live Real-time Metric Matrix</span>
+                        </div>
+                        <div class="space-y-3.5 pt-2">
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-purple-700" data-localize="metric_marketing">Automated Content / Marketing Assets</span>
+                                    <span class="text-indigo-900">68%</span>
+                                </div>
+                                <div class="w-full h-3 bg-purple-50 rounded-full overflow-hidden border border-purple-100"><div class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full" style="width: 68%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-rose-700" data-localize="metric_tax">Tax Compliance & Document Drafting</span>
+                                    <span class="text-indigo-900">42%</span>
+                                </div>
+                                <div class="w-full h-3 bg-rose-50 rounded-full overflow-hidden border border-rose-100"><div class="h-full bg-gradient-to-r from-rose-500 to-pink-600 rounded-full" style="width: 42%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-amber-700" data-localize="metric_logistics">Logistics Optimization & Route Vectoring</span>
+                                    <span class="text-indigo-900">81%</span>
+                                </div>
+                                <div class="w-full h-3 bg-amber-50 rounded-full overflow-hidden border border-amber-100"><div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" style="width: 81%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-indigo-900 to-purple-950 p-6 rounded-2xl text-white shadow-xl flex flex-col justify-between border border-indigo-950">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <span class="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-[10px] font-black uppercase tracking-widest text-amber-400" data-localize="lbl_quad_status">SLA Acceleration</span>
+                                <i class="fa-solid fa-bolt text-xl text-purple-400"></i>
+                            </div>
+                            <h4 class="text-xl font-black mt-4 leading-snug" data-localize="quad_title">Acquire Infinite Automation Upgrades</h4>
+                            <p class="text-xs text-indigo-200 mt-2 font-medium" data-localize="quad_body">Unlock unrestricted architectural execution, instant provider alignment thresholds, and API configuration passes.</p>
+                        </div>
+                        <button onclick="navigateToView('workspace')" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-indigo-950 font-black py-3 rounded-xl shadow-lg text-xs uppercase tracking-wider mt-4 hover:from-amber-400 hover:to-amber-500 transition-all">
+                            <span data-localize="quad_btn">Deploy Pipeline Node</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TRANSACTIONAL REGISTRY AND JOB MONITOR -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-black text-indigo-950" data-localize="tbl_title">Active Operational Pipeline Records</h3>
+                        <button onclick="navigateToView('workspace')" class="text-xs font-black text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                            <i class="fa-solid fa-circle-plus"></i> <span data-localize="tbl_btn_new">Instantiate Request</span>
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-indigo-50/70 border-b border-indigo-100">
+                                    <tr>
+                                        <th class="p-4 text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="th_id">Pipeline ID</th>
+                                        <th class="p-4 text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="th_type">Service Descriptor</th>
+                                        <th class="p-4 text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="th_status">Verification State</th>
+                                        <th class="p-4 text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="th_pro">Assigned Specialist</th>
+                                        <th class="p-4 text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="th_cost">SLA Allocation</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-indigo-50 font-semibold text-sm" id="dashboard-jobs-tbody">
+                                    <!-- Seed Data row 1 -->
+                                    <tr class="hover:bg-indigo-50/20 transition-colors">
+                                        <td class="p-4 text-indigo-500 font-mono text-xs">#KAZI-9082</td>
+                                        <td class="p-4 text-indigo-950"><i class="fa-brands fa-whatsapp text-teal-600 mr-2 text-base"></i>WhatsApp Campaign Ad Content</td>
+                                        <td class="p-4"><span class="px-2.5 py-1 bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-black rounded-full" data-localize="status_done">Execution Finalized</span></td>
+                                        <td class="p-4 text-indigo-700">AI Engine + Jane M.</td>
+                                        <td class="p-4 text-amber-700 font-bold">KES 500</td>
+                                    </tr>
+                                    <!-- Seed Data row 2 -->
+                                    <tr class="hover:bg-indigo-50/20 transition-colors">
+                                        <td class="p-4 text-indigo-500 font-mono text-xs">#KAZI-8941</td>
+                                        <td class="p-4 text-indigo-950"><i class="fa-solid fa-scale-balanced text-rose-600 mr-2 text-base"></i>KRA Tax Alignment Checklist</td>
+                                        <td class="p-4"><span class="px-2.5 py-1 bg-amber-100 border border-amber-200 text-amber-800 text-xs font-black rounded-full" data-localize="status_review">Expert Review Mode</span></td>
+                                        <td class="p-4 text-indigo-700">AI Engine + Peter K.</td>
+                                        <td class="p-4 text-amber-700 font-bold">KES 1,200</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW: AI WORKSPACE -->
+            <!-- ========================================== -->
+            <section id="view-workspace" class="flex-1 p-8 overflow-y-auto hidden app-view-panel space-y-6">
+                <div class="max-w-4xl mx-auto bg-white border border-indigo-100 shadow-xl rounded-2xl overflow-hidden flex flex-col">
+                    <div class="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-black flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-400 animate-spin"></i> <span data-localize="work_card_title">Initialize AI Orchestration Engine</span></h3>
+                            <p class="text-xs text-indigo-100 font-medium mt-1" data-localize="work_card_sub">Select an operational structural archetype template below to configure your deployment payload.</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: CONFIGURE PAYLOAD -->
+                    <div class="p-6 space-y-6" id="panel-work-step1">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <button onclick="selectWorkspaceTemplate('whatsapp_ad')" id="tmpl-whatsapp_ad" class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 text-left hover:border-indigo-400 transition-all font-bold space-y-2 group">
+                                <i class="fa-brands fa-whatsapp text-teal-600 text-2xl"></i>
+                                <p class="text-xs font-black text-indigo-950" data-localize="tmpl_wa_title">WhatsApp Ad Content</p>
+                            </button>
+                            <button onclick="selectWorkspaceTemplate('kra_tax')" id="tmpl-kra_tax" class="p-4 rounded-xl border border-indigo-100 text-left hover:border-indigo-400 transition-all font-bold space-y-2 group">
+                                <i class="fa-solid fa-scale-balanced text-rose-600 text-2xl"></i>
+                                <p class="text-xs font-black text-indigo-950" data-localize="tmpl_tax_title">Tax Checklist</p>
+                            </button>
+                            <button onclick="selectWorkspaceTemplate('routing')" id="tmpl-routing" class="p-4 rounded-xl border border-indigo-100 text-left hover:border-indigo-400 transition-all font-bold space-y-2 group">
+                                <i class="fa-solid fa-truck-ramp-box text-amber-600 text-2xl"></i>
+                                <p class="text-xs font-black text-indigo-950" data-localize="tmpl_log_title">Logistics Routing</p>
+                            </button>
+                            <button onclick="selectWorkspaceTemplate('invoice')" id="tmpl-invoice" class="p-4 rounded-xl border border-indigo-100 text-left hover:border-indigo-400 transition-all font-bold space-y-2 group">
+                                <i class="fa-solid fa-receipt text-indigo-600 text-2xl"></i>
+                                <p class="text-xs font-black text-indigo-950" data-localize="tmpl_inv_title">Invoice Matrix</p>
+                            </button>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="lbl_prompt_desc">Execution Constraints & Target Instruction Payload</label>
+                            <textarea id="workspace-prompt-input" rows="4" class="w-full p-4 rounded-xl border font-semibold outline-none colorful-input" placeholder="Configure parameters..."></textarea>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button onclick="triggerWorkspaceGeneration()" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-xl shadow-lg text-sm uppercase tracking-wider flex items-center space-x-2">
+                                <span data-localize="btn_gen">Execute Stream Pipeline</span> <i class="fa-solid fa-bolt-lightning ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: PROCESSING SIMULATION -->
+                    <div class="p-12 text-center space-y-4 hidden" id="panel-work-loading">
+                        <i class="fa-solid fa-spinner fa-spin text-5xl text-purple-600"></i>
+                        <p class="font-black text-indigo-900 text-lg" data-localize="loading_msg">Compiling network vector draft tokens...</p>
+                    </div>
+
+                    <!-- STEP 3: OUTPUT RESULT AND ACCELERATED UPGRADE FLOW -->
+                    <div class="p-6 space-y-6 hidden" id="panel-work-result">
+                        <div>
+                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-md border border-emerald-200 uppercase tracking-wider" data-localize="lbl_output_state"><i class="fa-solid fa-circle-check mr-1"></i> Core Generative Phase Ready</span>
+                        </div>
+                        
+                        <div class="p-5 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+                            <p class="font-semibold text-indigo-950 leading-relaxed text-sm whitespace-pre-wrap" id="workspace-output-text">Output rendering data payload...</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="saveResultAsTemplate()" class="p-3 border border-indigo-300 text-indigo-700 font-black rounded-xl hover:bg-indigo-50 transition-colors text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-bookmark text-purple-600"></i> <span data-localize="btn_save_tmpl">Save as Reusable Template</span>
+                            </button>
+                            <button onclick="copyGeneratedText()" class="p-3 border border-emerald-300 bg-emerald-50/30 text-emerald-800 font-black rounded-xl hover:bg-emerald-50 transition-colors text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-copy text-emerald-600"></i> <span id="copy-btn-txt" data-localize="btn_copy">Copy Asset to Clipboard</span>
+                            </button>
+                        </div>
+
+                        <!-- PRO FINISH MODAL INTERFACE / PAYMENT -->
+                        <div class="bg-gradient-to-r from-amber-500/10 to-purple-500/10 border-2 border-dashed border-purple-300 p-6 rounded-2xl space-y-4">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                    <h4 class="font-black text-indigo-950 text-base flex items-center"><i class="fa-solid fa-user-shield text-purple-700 mr-2"></i> <span data-localize="pro_title">Acquire Human Expert Localization Review (SLA Match)</span></h4>
+                                    <p class="text-xs text-indigo-600 font-bold mt-1" data-localize="pro_sub">Routes data to a vetted specialized agent within Murera/Nairobi for localization polish & verification.</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-black text-purple-700 uppercase tracking-widest" data-localize="lbl_cost">SLA Cost Tier</p>
+                                    <p class="text-2xl font-black text-amber-700">KES 200</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-purple-200 flex justify-end">
+                                <button onclick="initiatePaymentFlow()" class="px-6 py-3 bg-[#52B44B] hover:bg-[#469e3f] text-white font-black rounded-xl shadow-md transition-transform transform active:scale-95 text-xs uppercase tracking-wider flex items-center space-x-2">
+                                    <i class="fa-solid fa-mobile-screen"></i> <span data-localize="btn_mpesa">Authorize M-Pesa STK Push</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: TRANSACTION SUCCESS -->
+                    <div class="p-12 text-center space-y-4 hidden" id="panel-work-success">
+                        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-md border border-emerald-200"><i class="fa-solid fa-circle-check animate-bounce"></i></div>
+                        <h3 class="text-2xl font-black text-gradient-emerald" data-localize="pay_success_title">M-Pesa Clearing Settlement Finalized</h3>
+                        <p class="text-sm font-bold text-indigo-600 max-w-md mx-auto" data-localize="pay_success_sub">Verification token parsed. The network has matched your request with a regional operations provider. Track status in your ledger.</p>
+                        <div class="pt-4">
+                            <button onclick="navigateToView('dashboard')" class="px-6 py-2 border-2 border-indigo-600 text-indigo-700 font-black rounded-xl hover:bg-indigo-50 text-xs uppercase tracking-wider" data-localize="btn_back_dash">Return to Registry</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAVED INSTANCE ARCHIVE -->
+                <div class="max-w-4xl mx-auto space-y-3">
+                    <h4 class="text-sm font-black text-indigo-900 uppercase tracking-wider" data-localize="saved_tmpl_title">Persisted Enterprise Templates</h4>
+                    <div class="bg-white border border-indigo-100 rounded-xl shadow-sm p-4 text-xs font-bold text-indigo-500 text-center" id="empty-templates-msg" data-localize="no_tmpl_msg">
+                        No localized persistent templates mapped inside local disk cache.
+                    </div>
+                    <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden"></div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW: EXPERT MARKETPLACE -->
+            <!-- ========================================== -->
+            <section id="view-marketplace" class="flex-1 p-8 overflow-y-auto hidden app-view-panel space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-black text-indigo-950" data-localize="mkt_title">Vetted Operations Network Providers</h3>
+                        <p class="text-xs font-bold text-indigo-500" data-localize="mkt_sub">Independent verified compliance specialists matched to East Africa SLAs.</p>
+                    </div>
+                    <span class="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-black rounded-md"><i class="fa-solid fa-network-wired mr-1"></i> 100+ Nodes Live</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 font-black flex items-center justify-center text-lg">JM</div>
+                                <div class="flex items-center space-x-1 text-amber-500 font-black text-xs bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                    <i class="fa-solid fa-star"></i> <span>4.9</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-indigo-950 text-base">Jane Mwangi</h4>
+                                <p class="text-xs text-purple-600 font-extrabold" data-localize="mkt_role_copy">Local Brand Translation & Copywriting</p>
+                            </div>
+                            <p class="text-xs text-indigo-500 font-medium leading-relaxed" data-localize="mkt_desc_jane">Expert in Swahili conversions, localized hyper-targeted Murera marketing drops, and optimization campaigns.</p>
+                        </div>
+                        <div class="pt-3 border-t border-indigo-50 flex justify-between items-center">
+                            <span class="text-xs font-black text-emerald-600"><i class="fa-solid fa-circle text-[8px] mr-1 animate-ping"></i> Operational</span>
+                            <span class="text-sm font-black text-indigo-950">99.8% SLA</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 font-black flex items-center justify-center text-lg">PK</div>
+                                <div class="flex items-center space-x-1 text-amber-500 font-black text-xs bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                    <i class="fa-solid fa-star"></i> <span>5.0</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-indigo-950 text-base">Peter Kamau</h4>
+                                <p class="text-xs text-rose-600 font-extrabold" data-localize="mkt_role_tax">KRA Regulatory Alignment Specialist</p>
+                            </div>
+                            <p class="text-xs text-indigo-500 font-medium leading-relaxed" data-localize="mkt_desc_peter">SME structural balance accounting audits, tax validation compliance processing, and legal documentation checklists.</p>
+                        </div>
+                        <div class="pt-3 border-t border-indigo-50 flex justify-between items-center">
+                            <span class="text-xs font-black text-emerald-600"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Operational</span>
+                            <span class="text-sm font-black text-indigo-950">100% SLA</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 font-black flex items-center justify-center text-lg">AO</div>
+                                <div class="flex items-center space-x-1 text-amber-500 font-black text-xs bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                    <i class="fa-solid fa-star"></i> <span>4.8</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-indigo-950 text-base">Amos Omondi</h4>
+                                <p class="text-xs text-amber-600 font-extrabold" data-localize="mkt_role_log">Logistics System Matrix Dispatch</p>
+                            </div>
+                            <p class="text-xs text-indigo-500 font-medium leading-relaxed" data-localize="mkt_desc_amos">Nairobi-Kiambu transit routing matrix compilation, supply network mapping, and overhead validation.</p>
+                        </div>
+                        <div class="pt-3 border-t border-indigo-50 flex justify-between items-center">
+                            <span class="text-xs font-black text-indigo-600"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Hibernated</span>
+                            <span class="text-sm font-black text-indigo-950">97.4% SLA</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW: WHATSAPP INTEGRATION -->
+            <!-- ========================================== -->
+            <section id="view-whatsapp" class="flex-1 p-8 overflow-y-auto hidden app-view-panel space-y-6">
+                <div class="max-w-2xl mx-auto bg-white border border-indigo-100 shadow-xl rounded-2xl overflow-hidden">
+                    <div class="p-6 bg-gradient-to-r from-teal-600 to-emerald-600 text-white flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-brands fa-whatsapp text-4xl"></i>
+                            <div>
+                                <h3 class="text-lg font-black" data-localize="wa_title">WhatsApp Conversational Node Sync</h3>
+                                <p class="text-xs text-teal-50 font-medium" data-localize="wa_sub">Deploy autonomous conversational instances directly into operations.</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 bg-white/20 border border-white/30 rounded-md text-xs font-black uppercase tracking-wider" id="wa-node-status">Offline</span>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <div class="p-4 bg-teal-50 border border-teal-100 rounded-xl flex items-start space-x-3 text-teal-900 font-semibold text-xs leading-relaxed">
+                            <i class="fa-solid fa-circle-info text-teal-600 text-base mt-0.5"></i>
+                            <p data-localize="wa_info">When activated, clients can submit operational requirements directly through conversational chat vectors. KaziAI handles draft validation, processing requests on autopilot.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider mb-1" data-localize="lbl_wa_phone">Linked Gateway Phone Vector</label>
+                                <input type="text" id="wa-phone-mock" class="w-full p-3 rounded-xl border outline-none font-semibold colorful-input" value="+254 712 345678" readonly>
+                            </div>
+                            <div class="p-4 bg-indigo-50/40 border border-indigo-100 rounded-xl space-y-2">
+                                <h4 class="text-xs font-black text-indigo-900 uppercase tracking-wider" data-localize="lbl_wa_triggers">Autonomous Core Triggers Mapped</h4>
+                                <ul class="text-xs font-bold text-indigo-700 space-y-1.5 list-disc pl-4">
+                                    <li>"kazi" / "biza" — Instantiates request vector pipeline.</li>
+                                    <li>"bei" / "gharama" — Pulls transaction metric logs.</li>
+                                    <li>"mms" — Requests provider human review matching.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 flex justify-end">
+                            <button onclick="toggleWhatsAppNode()" id="btn-wa-toggle" class="px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-black rounded-xl shadow-md text-sm uppercase tracking-wider transition-colors">
+                                Activate Gateway Node
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- COMPREHENSIVE SPA SCRIPTING AND LOGIC -->
+    <!-- ========================================== -->
+    <script>
+        // CORE STRUCTURAL ARCHITECTURAL STATE
+        let activeView = 'dashboard';
+        let userLanguage = 'en'; 
+        let isAuthLoginMode = false; 
+        let sessionToken = null;
+
+        // SEED TEMPLATE CONSTANTS FOR THE AI CORE ARCHETYPE MAPPING
+        const structuralTemplates = {
+            whatsapp_ad: {
+                en: "Write a high-converting promotional WhatsApp message for my business based in Kiambu/Nairobi. Accentuate speed and free shipping within the CBD, including relevant emojis.",
+                sw: "Andika ujumbe wa WhatsApp wa kuvutia wateja kwa biashara yangu iliyoko Kiambu/Nairobi. Sisitiza kasi na usafirishaji wa bure ndani ya CBD, weka emojis zinazofaa.",
+                output_en: "🔥 Fresh Delivery Pipeline Alert! 🔥\n\nThe newest structural stock items hit the inventory lines tomorrow in Nairobi! Reply immediately to reserve yours before allocations exhaust.\n\n🚚 ZERO COST delivery matrix running inside CBD lines!\n⚡ High efficiency execution guaranteed. Tap link to route chat to checkout.",
+                output_sw: "🔥 Taarifa Muhimu ya Mzigo Mpya! 🔥\n\nMzigo mpya kabisa unawasili kesho Nairobi! Jibu sasa hivi uhifadhi nafasi yako kabla bidhaa hazijaisha.\n\n🚚 Usafirishaji wa BURE kabisa ndani ya CBD!\n⚡ Uhakika wa kazi safi na haraka. Bonyeza link kuanza agizo lako sasa."
+            },
+            kra_tax: {
+                en: "Generate a complete standard KRA micro-business annual tax compliance filing structure checklist for an independent software entity registered in East Africa.",
+                sw: "Tengeneza orodha kamili ya ukaguzi wa kodi ya kila mwaka ya KRA kwa biashara ndogo ya programu ya kompyuta iliyosajiliwa Afrika Mashariki.",
+                output_en: "📊 KRA Tax Compliance Vector Matrix [Micro-Entity Standard]:\n\n1. Validate update logs inside the iTax platform credentials mapping.\n2. Reconcile gross mobile payment logs (M-Pesa business ledger statement validation).\n3. Compile operational overhead receipts (Server arrays, node architecture, utility invoices).\n4. Match withholding tax certificates against corporate allocation channels.",
+                output_sw: "📊 Orodha ya Ukaguzi wa Kodi ya KRA [Kiwango cha Biashara Ndogo]:\n\n1. Hakiki kumbukumbu za hivi karibuni kwenye mfumo wa iTax.\n2. Uwianishe mapato ya miamala ya simu (Taarifa rasmi ya malipo ya M-Pesa Business).\n3. Kusanya risiti zote za gharama za uendeshaji (Mifumo ya seva, usimamizi, na kodi).\n4. Linganisha vyeti vya kodi ya zuio dhidi ya mapato ya kampuni."
+            },
+            routing: {
+                en: "Compile a 3-point micro-logistics freight delivery optimization routing plan vector linking Thika, Murera, and central Nairobi distribution hubs to minimize fuel burn.",
+                sw: "Tengeneza mpango wa usafirishaji wa hatua 3 wa kuboresha njia za usambazaji unaounganisha Thika, Murera, na vituo vya katikati mwa Nairobi ili kupunguza gharama ya mafuta.",
+                output_en: "🚚 Optimal Transit Logistics Route Routing Matrix:\n\n- Node 01: Dispatch from Thika Hub at 05:45 EAT to bypass highway bottleneck vectors.\n- Node 02: Drop off load cluster at Murera collection depot via exit segment link 14.\n- Node 03: Use internal bypass lines to access central Nairobi distribution grid safely by 08:30 EAT.",
+                output_sw: "🚚 Njia Bora ya Usafirishaji na Usambazaji:\n\n- Kituo 01: Ondoka Thika Hub saa 11:45 Alfajiri ili kuepuka msongamano wa magari barabarani.\n- Kituo 02: Shusha mzigo kwenye bohari ya mkusanyiko ya Murera kupitia njia ya mkato ya 14.\n- Kituo 03: Tumia barabara za ndani kuingia katikati mwa jiji la Nairobi kufikia saa 2:30 Asubuhi."
+            },
+            invoice: {
+                en: "Generate a raw single-item service invoice template architecture payload listing unit transaction fees and structural platform operational parameters.",
+                sw: "Tengeneza fomu ya risiti ya malipo ya huduma moja inayoonyesha ada za miamala na vigezo vya uendeshaji wa mfumo.",
+                output_en: "🧾 Platform Transaction Service Invoice Instance:\n\n- Entity Reference: KaziAI Digital Node Matrix\n- Item Line: AI Core Generation Operational Allocation\n- Sub-Total Volume Cost: KES 180.00\n- Automated Marketplace Platform Take Rate Fee (10%): KES 20.00\n- Final Cumulative Balance Settlement: KES 200.00",
+                output_sw: "🧾 Risiti ya Malipo ya Huduma ya Mfumo:\n\n- Rejeleo la Biashara: Mtandao wa Kidijitali wa KaziAI\n- Kipengele: Gharama ya Uendeshaji wa Mfumo wa AI\n- Jumla Ndogo ya Gharama: KES 180.00\n- Ada ya Uendeshaji wa Soko la KaziAI (10%): KES 20.00\n- Malipo Kamili ya Mwisho: KES 200.00"
+            }
+        };
+
+        // L10N SYSTEM TRANSLATION DICTIONARY (LOCALIZATION MATRIX)
+        const localizationMatrix = {
+            en: {
+                menu_dash: "Dashboard Overview", menu_work: "AI Draft Workspace", menu_market: "Expert Verification", menu_wa: "WhatsApp Delivery",
+                lbl_active_profile: "Active System Entity", btn_exit: "Exit", welcome_msg: "Operational Command Engine",
+                welcome_sub: "Real-time optimization metrics and automation channels.", lbl_wallet: "Wallet Settlement",
+                card_total_jobs: "Total Jobs Instantiated", card_ai_drafts: "AI Pipeline Generatives", card_hours: "Resource Window Saved",
+                card_lift: "Conversion Vector Lift", chart_title: "System Production & Volume Performance", metric_marketing: "Automated Content / Marketing Assets",
+                metric_tax: "Tax Compliance & Document Drafting", metric_logistics: "Logistics Optimization & Route Vectoring", lbl_quad_status: "SLA Acceleration",
+                quad_title: "Acquire Infinite Automation Upgrades", quad_body: "Unlock unrestricted architectural execution, instant provider alignment thresholds, and API configuration passes.",
+                quad_btn: "Deploy Pipeline Node", tbl_title: "Active Operational Pipeline Records", tbl_btn_new: "Instantiate Request",
+                th_id: "Pipeline ID", th_type: "Service Descriptor", th_status: "Verification State", th_pro: "Assigned Specialist",
+                th_cost: "SLA Allocation", status_done: "Execution Finalized", status_review: "Expert Review Mode",
+                work_card_title: "Initialize AI Orchestration Engine", work_card_sub: "Select an operational structural archetype template below to configure your deployment payload.",
+                tmpl_wa_title: "WhatsApp Ad Content", tmpl_tax_title: "Tax Checklist", tmpl_log_title: "Logistics Routing",
+                tmpl_inv_title: "Invoice Matrix", lbl_prompt_desc: "Execution Constraints & Target Instruction Payload", btn_gen: "Execute Stream Pipeline",
+                loading_msg: "Compiling network vector draft tokens...", lbl_output_state: "Core Generative Phase Ready",
+                btn_save_tmpl: "Save as Reusable Template", btn_copy: "Copy Asset to Clipboard", pro_title: "Acquire Human Expert Localization Review (SLA Match)",
+                pro_sub: "Routes data to a vetted specialized agent within Murera/Nairobi for localization polish & verification.",
+                lbl_cost: "SLA Cost Tier", btn_mpesa: "Authorize M-Pesa STK Push", pay_success_title: "M-Pesa Clearing Settlement Finalized",
+                pay_success_sub: "Verification token parsed. The network has matched your request with a regional operations provider. Track status in your ledger.",
+                btn_back_dash: "Return to Registry", saved_tmpl_title: "Persisted Enterprise Templates", no_tmpl_msg: "No localized persistent templates mapped inside local disk cache.",
+                mkt_title: "Vetted Operations Network Providers", mkt_sub: "Independent verified compliance specialists matched to East Africa SLAs.",
+                mkt_role_copy: "Local Brand Translation & Copywriting", mkt_desc_jane: "Expert in Swahili conversions, localized hyper-targeted Murera marketing drops, and optimization campaigns.",
+                mkt_role_tax: "KRA Regulatory Alignment Specialist", mkt_desc_peter: "SME structural balance accounting audits, tax validation compliance processing, and legal documentation checklists.",
+                mkt_role_log: "Logistics System Matrix Dispatch", mkt_desc_amos: "Nairobi-Kiambu transit routing matrix compilation, supply network mapping, and overhead validation.",
+                wa_title: "WhatsApp Conversational Node Sync", wa_sub: "Deploy autonomous conversational instances directly into operations.",
+                wa_info: "When activated, clients can submit operational requirements directly through conversational chat vectors. KaziAI handles draft validation, processing requests on autopilot.",
+                lbl_wa_phone: "Linked Gateway Phone Vector", lbl_wa_triggers: "Autonomous Core Triggers Mapped"
+            },
+            sw: {
+                menu_dash: "Mwanzo na Takwimu", menu_work: "Uundaji wa AI", menu_market: "Soko la Wataalamu", menu_wa: "Uendeshaji wa WhatsApp",
+                lbl_active_profile: "Akaunti Inayofanya Kazi", btn_exit: "Ondoka", welcome_msg: "Mfumo Mkuu wa Uendeshaji",
+                welcome_sub: "Marekebisho ya takwimu za mfumo na njia za kiotomatiki kwa wakati halisi.", lbl_wallet: "Salio la Pochi",
+                card_total_jobs: "Jumla ya Kazi Zilizoundwa", card_ai_drafts: "Muzigo wa Kidijitali wa AI", card_hours: "Muda Uliookolewa",
+                card_lift: "Ukuaji wa Biashara", chart_title: "Ufanisi wa Mfumo na Kiwango cha Uzalishaji", metric_marketing: "Maudhui ya Masoko / Matangazo ya Kiotomatiki",
+                metric_tax: "Uandaaji wa Nyaraka za Kodi na Sheria", metric_logistics: "Mipango ya Usafirishaji na Usambazaji", lbl_quad_status: "Uharakishaji wa SLA",
+                quad_title: "Pata Maboresho ya Kiotomatiki Isiyo na Kikomo", quad_body: "Fungua uwezo kamili wa mfumo, upatikanaji wa wataalamu wa haraka, na fursa za usanidi wa API.",
+                quad_btn: "Weka Njia Mpya ya Mfumo", tbl_title: "Kumbukumbu za Kazi Zinazoendelea Mfomoni", tbl_btn_new: "Anzisha Ombi Jipya",
+                th_id: "Nambari ya Kazi", th_type: "Maelezo ya Huduma", th_status: "Hali ya Uhakiki", th_pro: "Mtaalamu Aliyeteuliwa",
+                th_cost: "Gharama ya SLA", status_done: "Kazi Imekamilika", status_review: "Uhakiki wa Wataalamu",
+                work_card_title: "Anzisha Mfumo Mkuu wa AI", work_card_sub: "Chagua muundo wa mfano hapa chini ili kusanidi maagizo yako ya kazi.",
+                tmpl_wa_title: "Matangazo ya WhatsApp", tmpl_tax_title: "Orodha ya Kodi", tmpl_log_title: "Njia za Usafirishaji",
+                tmpl_inv_title: "Mfumo wa Risiti", lbl_prompt_desc: "Maelezo ya Kazi na Maagizo Maalum ya Payload", btn_gen: "Tekeleza Agizo la AI",
+                loading_msg: "Tunatengeneza muundo wa kidijitali wa AI sasa hivi...", lbl_output_state: "Muundo wa Kwanza wa AI Uko Tayari",
+                btn_save_tmpl: "Hifadhi kama Kiolezo cha Kudumu", btn_copy: "Nakili Maandishi Kwenye Ubao", pro_title: "Pata Uhakiki na Maboresho kutoka kwa Mtaalamu (SLA)",
+                pro_sub: "Inatuma data hii kwa mtaalamu aliyethibitishwa ndani ya Murera/Nairobi kwa marekebisho na uhakiki wa kina.",
+                lbl_cost: "Kiwango cha Gharama", btn_mpesa: "idhinisha Malipo ya M-Pesa STK Push", pay_success_title: "Malipo ya M-Pesa Yamekamilika na Kuthibitishwa",
+                pay_success_sub: "Tokeni ya uthibitisho imepokelewa. Mfumo umelinganisha ombi lako na mtaalamu wa kikanda. Angalia hali ya kazi kwenye dashibodi yako.",
+                btn_back_dash: "Rudi Kwenye Kumbukumbu", saved_tmpl_title: "Violezo vya Kudumu Vilivyohifadhiwa", no_tmpl_msg: "Hakuna violezo vya kudumu vilivyohifadhiwa kwenye diski ya cache.",
+                mkt_title: "Mtandao wa Wataalamu Waliothibitishwa", mkt_sub: "Wataalamu huru wa kodi na sheria waliolinganishwa na viwango vya Afrika Mashariki.",
+                mkt_role_copy: "Tafsiri ya Chapa na Uandishi wa Matangazo", mkt_desc_jane: "Mtaalamu wa uandishi wa kiswahili, matangazo yaliyolenga soko la Murera na mikakati ya kukuza biashara.",
+                mkt_role_tax: "Mtaalamu wa Sheria na Kodi ya KRA", mkt_desc_peter: "Ukaguzi wa hesabu za biashara ndogo ndogo, usindikaji wa kodi ya KRA na orodha za kisheria.",
+                mkt_role_log: "Usimamizi wa Mfumo wa Usambazaji Bidhaa", mkt_desc_amos: "Uandaaji wa njia bora za usafirishaji kati ya Nairobi na Kiambu, na kupunguza gharama za uendeshaji.",
+                wa_title: "Kuunganisha Lango la WhatsApp", wa_sub: "Weka mifumo ya kiotomatiki ya mazungumzo moja kwa moja kwenye uendeshaji wako.",
+                wa_info: "Inapowekwa tayari, wateja wanaweza kutuma maombi ya uendeshaji moja kwa moja kupitia soga ya WhatsApp. KaziAI inashughulikia uandishi wa kwanza kiotomatiki.",
+                lbl_wa_phone: "Nambari ya Simu ya Lango Lililounganishwa", lbl_wa_triggers: "Neno Muhimu la Kuanzisha Mfumo Kiotomatiki"
+            }
+        };
+
+        // RUN ON INITIAL LOADING RUN OVER THE DOM
+        window.onload = () => {
+            const activeSession = localStorage.getItem('kaziai_session_active');
+            if (activeSession) {
+                sessionToken = JSON.parse(activeSession);
+                instantiateSessionState();
+            } else {
+                switchAuthMode(); // Ensure interface default positioning
+            }
+            selectWorkspaceTemplate('whatsapp_ad');
+            renderSavedTemplatesUI();
+        };
+
+        // INTERFACE TRANSITION LAYER FOR APPARATUS VIEW SWITCHING
+        function navigateToView(targetView) {
+            activeView = targetView;
+            
+            // Loop hide panels
+            document.querySelectorAll('.app-view-panel').forEach(panel => panel.classList.add('hidden'));
+            // Remove navigation highlights
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all text-indigo-700 hover:bg-indigo-50/50";
+                btn.querySelector('i:last-child').className = "fa-solid fa-chevron-right text-xs opacity-0";
+            });
+
+            // Active display allocation
+            document.getElementById(`view-${targetView}`).classList.remove('hidden');
+            
+            let activeNavBtn = document.getElementById(`nav-${targetView}`);
+            if (activeNavBtn) {
+                activeNavBtn.className = "w-full flex items-center justify-between p-3.5 rounded-xl font-bold transition-all bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-900 border-l-4 border-indigo-600";
+                activeNavBtn.querySelector('i:last-child').className = "fa-solid fa-chevron-right text-xs opacity-50";
+            }
+
+            // Context header modifications via active location
+            const titles = {
+                dashboard: { en: "Operational Command Engine", sw: "Mfumo Mkuu wa Uendeshaji" },
+                workspace: { en: "AI Pipeline Engine Workspace", sw: "Eneo la Kazi la AI" },
+                marketplace: { en: "Verified Human Operator Ecosystem", sw: "Soko la Wataalamu Waliothibitishwa" },
+                whatsapp: { en: "Autonomous Communication Gateway", sw: "Lango la Kiotomatiki la WhatsApp" }
+            };
+            const subtitles = {
+                dashboard: { en: "Real-time optimization metrics and automation channels.", sw: "Marekebisho ya takwimu za mfumo na njia za kiotomatiki kwa wakati halisi." },
+                workspace: { en: "Construct structural generative outputs combined with professional review loops.", sw: "Tengeneza maudhui ya AI pamoja na uhakiki wa wataalamu wetu." },
+                marketplace: { en: "Direct connection vectors to vetted freelance execution nodes across Kenya.", sw: "Unganisha moja kwa moja na wataalamu huru kote nchini Kenya." },
+                whatsapp: { en: "Configure interactive endpoints to stream workflows directly via communication layers.", sw: "Sanidi njia za mawasiliano ili kuendesha kazi moja kwa moja kupitia WhatsApp." }
+            };
+
+            document.getElementById('header-main-title').innerText = titles[targetView][userLanguage];
+            document.getElementById('header-sub-title').innerText = subtitles[targetView][userLanguage];
+        }
+
+        // ACCOUNT CONTROLLER LOGIC ENGINE
+        function switchAuthMode() {
+            isAuthLoginMode = !isAuthLoginMode;
+            document.getElementById('field-biz-name').style.display = isAuthLoginMode ? 'none' : 'block';
+            document.getElementById('btn-auth-submit').innerText = isAuthLoginMode ? 'Verify Access Keys' : 'Initialize Core Account';
+            document.getElementById('btn-auth-toggle').innerText = isAuthLoginMode ? "Create New Enterprise Node Registration" : "Already registered? Access Workspace Here";
+            document.getElementById('auth-tagline').innerText = isAuthLoginMode ? "Access secure operations workspace." : "Work done. Locally smart.";
+            document.getElementById('auth-error-msg').classList.add('hidden');
+        }
+
+        function executeAuthentication(event) {
+            event.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-pass').value.trim();
+            const businessName = document.getElementById('auth-biz').value.trim();
+            const errorElement = document.getElementById('auth-error-msg');
+
+            if (!isAuthLoginMode) {
+                // Register account routing path
+                const userPayload = { email, password, name: businessName || 'Faith Mbatia Operations' };
+                localStorage.setItem('kaziai_db_node_' + email, JSON.stringify(userPayload));
+                finalizeLoginResolution(userPayload);
+            } else {
+                // Login credentials routing path
+                const registrySearch = localStorage.getItem('kaziai_db_node_' + email);
+                if (registrySearch) {
+                    const parsedPayload = JSON.parse(registrySearch);
+                    if (parsedPayload.password === password) {
+                        finalizeLoginResolution(parsedPayload);
+                        return;
+                    }
+                }
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        function finalizeLoginResolution(userObject) {
+            sessionToken = userObject;
+            localStorage.setItem('kaziai_session_active', JSON.stringify(userObject));
+            instantiateSessionState();
+        }
+
+        function instantiateSessionState() {
+            document.getElementById('user-display-title').innerText = sessionToken.name;
+            
+            // Graphical fade sequence out of authorization gateway
+            const gate = document.getElementById('auth-screen');
+            gate.classList.add('opacity-0', 'pointer-events-none');
+            
+            const appMainFrame = document.getElementById('app-screen');
+            appMainFrame.classList.remove('hidden');
+            setTimeout(() => { appMainFrame.classList.add('opacity-100'); }, 50);
+            navigateToView('dashboard');
+        }
+
+        function terminateSession() {
+            sessionToken = null;
+            localStorage.removeItem('kaziai_session_active');
+            
+            document.getElementById('auth-form').reset();
+            const appMainFrame = document.getElementById('app-screen');
+            appMainFrame.classList.remove('opacity-100');
+            
+            setTimeout(() => {
+                appMainFrame.classList.add('hidden');
+                const gate = document.getElementById('auth-screen');
+                gate.classList.remove('opacity-0', 'pointer-events-none');
+                if (isAuthLoginMode) switchAuthMode();
+            }, 500);
+        }
+
+        // SYSTEM L10N INTERACTIVE METHOD
+        function toggleSystemLanguage() {
+            userLanguage = userLanguage === 'en' ? 'sw' : 'en';
+            document.getElementById('lang-btn-txt').innerText = userLanguage === 'en' ? 'Swahili' : 'English';
+            
+            // Interrogator query selecting elements targeting localized markers
+            document.querySelectorAll('[data-localize]').forEach(el => {
+                const key = el.getAttribute('data-localize');
+                if (localizationMatrix[userLanguage][key]) {
+                    el.innerText = localizationMatrix[userLanguage][key];
+                }
+            });
+
+            // Synchronize active view labels dynamically
+            navigateToView(activeView);
+            
+            // Refresh prompt tracking state based on localized change
+            const activeActiveTemplate = document.querySelector('[id^="tmpl-"].border-indigo-400');
+            if (activeActiveTemplate) {
+                const typeId = activeActiveTemplate.id.replace('tmpl-', '');
+                selectWorkspaceTemplate(typeId);
+            }
+        }
+
+        // WORKSPACE PIPELINE CONTROLLER
+        function selectWorkspaceTemplate(templateKey) {
+            document.querySelectorAll('[id^="tmpl-"]').forEach(btn => {
+                btn.className = "p-4 rounded-xl border border-indigo-100 text-left hover:border-indigo-400 transition-all font-bold space-y-2 group";
+            });
+            document.getElementById(`tmpl-${templateKey}`).className = "p-4 rounded-xl border-2 border-indigo-400 bg-indigo-50/70 text-left transition-all font-bold space-y-2 group";
+            document.getElementById('workspace-prompt-input').value = structuralTemplates[templateKey][userLanguage];
+            document.getElementById('workspace-prompt-input').setAttribute('data-active-key', templateKey);
+        }
+
+        function triggerWorkspaceGeneration() {
+            document.getElementById('panel-work-step1').classList.add('hidden');
+            document.getElementById('panel-work-loading').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('panel-work-loading').classList.add('hidden');
+                const activeKey = document.getElementById('workspace-prompt-input').getAttribute('data-active-key');
+                document.getElementById('workspace-output-text').innerText = structuralTemplates[activeKey][`output_${userLanguage}`];
+                document.getElementById('panel-work-result').classList.remove('hidden');
+            }, 1500);
+        }
+
+        function copyGeneratedText() {
+            const targetTxt = document.getElementById('workspace-output-text').innerText;
+            navigator.clipboard.writeText(targetTxt);
+            const btnTxt = document.getElementById('copy-btn-txt');
+            btnTxt.innerText = userLanguage === 'en' ? 'Copied Successfully!' : 'Imenakiliwa Kwenye Ubao!';
+            setTimeout(() => {
+                btnTxt.innerText = userLanguage === 'en' ? 'Copy Asset to Clipboard' : 'Nakili Maandishi Kwenye Ubao';
+            }, 2000);
+        }
+
+        function saveResultAsTemplate() {
+            const activeKey = document.getElementById('workspace-prompt-input').getAttribute('data-active-key');
+            const dataContent = document.getElementById('workspace-output-text').innerText;
+            
+            let internalArchive = JSON.parse(localStorage.getItem('kaziai_saved_templates') || '[]');
+            internalArchive.push({ id: Date.now(), key: activeKey, content: dataContent });
+            localStorage.setItem('kaziai_saved_templates', JSON.stringify(internalArchive));
+            
+            renderSavedTemplatesUI();
+            alert(userLanguage === 'en' ? 'Template cached inside active system registry.' : 'Kiolezo kimehifadhiwa kwenye kumbukumbu ya mfumo.');
+        }
+
+        function renderSavedTemplatesUI() {
+            const internalArchive = JSON.parse(localStorage.getItem('kaziai_saved_templates') || '[]');
+            const container = document.getElementById('templates-grid');
+            const placeholder = document.getElementById('empty-templates-msg');
+
+            if (internalArchive.length === 0) {
+                placeholder.classList.remove('hidden');
+                container.classList.add('hidden');
+                return;
+            }
+
+            placeholder.classList.add('hidden');
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            internalArchive.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = "bg-white p-4 rounded-xl border border-indigo-100 shadow-sm space-y-2 relative";
+                itemCard.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black text-purple-600 uppercase tracking-wider">${item.key.toUpperCase()} INSTANCE</span>
+                        <button onclick="purgeTemplate(${item.id})" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                    <p class="text-xs text-indigo-950 font-semibold line-clamp-2">${item.content}</p>
+                `;
+                container.appendChild(itemCard);
+            });
+        }
+
+        function purgeTemplate(idValue) {
+            let internalArchive = JSON.parse(localStorage.getItem('kaziai_saved_templates') || '[]');
+            internalArchive = internalArchive.filter(i => i.id !== idValue);
+            localStorage.setItem('kaziai_saved_templates', JSON.stringify(internalArchive));
+            renderSavedTemplatesUI();
+        }
+
+        // M-PESA TRANSACTION AND CLEARING SIMULATOR
+        function initiatePaymentFlow() {
+            const authorizeBtn = event.currentTarget;
+            authorizeBtn.disabled = true;
+            authorizeBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Broadcast Trigger Sent to Phone...`;
+            authorizeBtn.className = "px-6 py-3 bg-indigo-500 text-white font-black rounded-xl shadow-md cursor-not-allowed text-xs uppercase tracking-wider flex items-center space-x-2";
+
+            setTimeout(() => {
+                // Deduct balance simulated transaction logs
+                let currentBal = parseInt(document.getElementById('wallet-balance').innerText.replace(/[^\d]/g, ''));
+                currentBal += 200; // Simulating platform flow addition metrics
+                document.getElementById('wallet-balance').innerText = `KES ${currentBal.toLocaleString()}`;
+
+                // Update active dashboard table entries runtime sequence
+                const tbody = document.getElementById('dashboard-jobs-tbody');
+                const uniqueId = Math.floor(1000 + Math.random() * 9000);
+                const rowNode = document.createElement('tr');
+                rowNode.className = "hover:bg-indigo-50/20 transition-colors";
+                
+                const currentTemplateKey = document.getElementById('workspace-prompt-input').getAttribute('data-active-key');
+                const serviceLabel = currentTemplateKey === 'whatsapp_ad' ? 'WhatsApp Campaign Ad Content' :
+                                     currentTemplateKey === 'kra_tax' ? 'KRA Tax Alignment Checklist' :
+                                     currentTemplateKey === 'routing' ? 'Logistics Routing Vector Plan' : 'Platform Invoice Data Sheet';
+
+                rowNode.innerHTML = `
+                    <td class="p-4 text-indigo-500 font-mono text-xs">#KAZI-${uniqueId}</td>
+                    <td class="p-4 text-indigo-950"><i class="fa-solid fa-wand-magic-sparkles text-purple-500 mr-2 text-base"></i>${serviceLabel}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 bg-amber-100 border border-amber-200 text-amber-800 text-xs font-black rounded-full">${userLanguage === 'en' ? 'Expert Review Mode' : 'Uhakiki wa Wataalamu'}</span></td>
+                    <td class="p-4 text-indigo-700">AI Engine + Jane M.</td>
+                    <td class="p-4 text-amber-700 font-bold">KES 200</td>
+                `;
+                tbody.insertBefore(rowNode, tbody.firstChild);
+
+                // Dynamically increment counter metrics
+                let totalJobsElement = document.getElementById('stat-total-jobs');
+                totalJobsElement.innerText = parseInt(totalJobsElement.innerText) + 1;
+
+                // View management adjustment switches
+                document.getElementById('panel-work-result').classList.add('hidden');
+                document.getElementById('panel-work-success').classList.remove('hidden');
+                
+                // Restore button condition metrics
+                authorizeBtn.disabled = false;
+                authorizeBtn.innerHTML = `<i class="fa-solid fa-mobile-screen"></i> <span>Authorize M-Pesa STK Push</span>`;
+                authorizeBtn.className = "px-6 py-3 bg-[#52B44B] hover:bg-[#469e3f] text-white font-black rounded-xl shadow-md transition-transform transform active:scale-95 text-xs uppercase tracking-wider flex items-center space-x-2";
+            }, 3000);
+        }
+
+        // WHATSAPP INSTANCE ENDPOINT MANAGER
+        function toggleWhatsAppNode() {
+            const btn = document.getElementById('btn-wa-toggle');
+            const indicator = document.getElementById('wa-node-status');
+
+            if (indicator.innerText === 'Offline' || indicator.innerText === 'Zima Lango') {
+                indicator.innerText = userLanguage === 'en' ? 'Online & Linked' : 'Inafanya Kazi';
+                indicator.className = "px-2.5 py-1 bg-emerald-500 border border-emerald-400 text-white text-xs font-black rounded-md uppercase tracking-wider animate-pulse";
+                btn.innerText = userLanguage === 'en' ? 'Disconnect Gateway Node' : 'Zima Lango la Kiotomatiki';
+                btn.className = "px-6 py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-black rounded-xl shadow-md text-sm uppercase tracking-wider transition-colors";
+            } else {
+                indicator.innerText = 'Offline';
+                indicator.className = "px-2.5 py-1 bg-white/20 border border-white/30 rounded-md text-xs font-black uppercase tracking-wider";
+                btn.innerText = userLanguage === 'en' ? 'Activate Gateway Node' : 'Washa Lango la Kiotomatiki';
+                btn.className = "px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-black rounded-xl shadow-md text-sm uppercase tracking-wider transition-colors";
+            }
+        }
+    </script>
+</body>
+</html>
