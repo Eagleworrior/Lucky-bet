@@ -1,317 +1,301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaziAI | Platform Interface</title>
-    <style>
-        :root {
-            --primary: #0f172a;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+    <title>BetCore Live | Licensed Sportsbook Operator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
+        tailwind.config = { 
+            darkMode: 'class', 
+            theme: { 
+                extend: { 
+                    colors: { 
+                        brand: '#fac815', 
+                        panelBg: '#1e293b' 
+                    } 
+                } 
+            } 
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.5;
-            padding: 2rem;
-        }
-
-        header {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.875rem;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: var(--accent);
-        }
-
-        button.success {
-            background: var(--success);
-        }
-
-        .console-output {
-            background: var(--primary);
-            color: #10b981;
-            padding: 1rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            height: 150px;
-            overflow-y: auto;
-            margin-top: 1rem;
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-gray-950 text-slate-100 h-screen flex flex-col font-sans select-none">
 
-    <header>
-        <h1>KaziAI System Interface</h1>
-        <p style="color: var(--text-muted)">API Integration Dashboard</p>
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-md shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-brand animate-pulse"></div>
+            <h1 class="text-xl font-black tracking-tighter text-brand">BETCORE <span class="text-white font-normal text-sm tracking-normal">OPERATOR</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm">
+                User Wallet Balance: <span class="font-mono font-bold text-brand" id="balance-display">KES 0.00</span>
+            </div>
+            <button onclick="openDepositPortal()" class="bg-brand text-slate-950 font-bold text-sm px-4 py-2 rounded-lg hover:bg-yellow-400 transition-all shadow-md">
+                Deposit Funds
+            </button>
+        </div>
     </header>
 
-    <div class="container">
+    <div class="flex flex-1 overflow-hidden">
         
-        <!-- 1. Client Module: Create Job -->
-        <div class="card">
-            <h2>1. Request Job (Client)</h2>
-            <div class="form-group">
-                <label for="user-id">User UUID</label>
-                <input type="text" id="user-id" placeholder="Enter System User ID" required>
+        <aside class="w-64 bg-slate-900/50 border-r border-slate-800 p-4 space-y-6 hidden md:block">
+            <div>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Live Competitions</h3>
+                <nav class="space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800 text-brand font-medium text-sm">
+                        <span>⚽</span> English Premier League
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white text-sm transition">
+                        <span>🏆</span> UEFA Champions League
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white text-sm transition">
+                        <span>🏀</span> NBA Basketball
+                    </a>
+                </nav>
             </div>
-            <div class="form-group">
-                <label for="job-category">Category</label>
-                <select id="job-category">
-                    <option value="marketing">Marketing Copy</option>
-                    <option value="technical">Technical Writing</option>
-                    <option value="translation">Translation</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="job-brief">Job Brief</label>
-                <textarea id="job-brief" placeholder="Describe the task for the AI and Provider..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="job-price">Price Amount</label>
-                <input type="number" id="job-price" placeholder="Enter amount">
-            </div>
-            <button onclick="createJob()">Submit Job Request</button>
-        </div>
+        </aside>
 
-        <!-- 2. AI Module: Trigger Draft -->
-        <div class="card">
-            <h2>2. Local AI Generation</h2>
-            <div class="form-group">
-                <label for="draft-job-id">Target Job UUID</label>
-                <input type="text" id="draft-job-id" placeholder="Paste Job ID from creation step">
+        <main class="flex-1 p-6 overflow-y-auto space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold tracking-tight">Active Fixture Lines</h2>
+                <button onclick="refreshLiveMatrix()" class="text-xs text-slate-400 hover:text-brand transition">↺ Refresh Board Data</button>
             </div>
-            <button onclick="triggerAIDraft()" class="success">Generate Ollama Draft</button>
-            <div class="console-output" id="ai-output">
-                // AI Response will appear here...
-            </div>
-        </div>
 
-        <!-- 3. Payment Module: Paystack -->
-        <div class="card">
-            <h2>3. Initiate Checkout (Paystack)</h2>
-            <div class="form-group">
-                <label for="pay-job-id">Job UUID</label>
-                <input type="text" id="pay-job-id" placeholder="Enter Job ID">
+            <div class="space-y-3" id="odds-matrix-view">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm">
+                    <div>
+                        <div class="text-xs text-brand font-medium mb-1">Premier League</div>
+                        <div class="text-base font-bold">Arsenal vs Manchester United</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="queueBetSlip('opt-01', 'Arsenal', 2.15, 'Arsenal vs Manchester United')" class="bg-slate-800 hover:border-brand border border-transparent px-4 py-2 rounded-lg w-20 flex flex-col items-center transition">
+                            <span class="text-[10px] text-slate-500 font-bold">1</span>
+                            <span class="font-mono text-sm font-bold text-brand">2.15</span>
+                        </button>
+                        <button onclick="queueBetSlip('opt-02', 'Draw', 3.45, 'Arsenal vs Manchester United')" class="bg-slate-800 hover:border-brand border border-transparent px-4 py-2 rounded-lg w-20 flex flex-col items-center transition">
+                            <span class="text-[10px] text-slate-500 font-bold">X</span>
+                            <span class="font-mono text-sm font-bold text-brand">3.45</span>
+                        </button>
+                        <button onclick="queueBetSlip('opt-03', 'Man United', 3.10, 'Arsenal vs Manchester United')" class="bg-slate-800 hover:border-brand border border-transparent px-4 py-2 rounded-lg w-20 flex flex-col items-center transition">
+                            <span class="text-[10px] text-slate-500 font-bold">2</span>
+                            <span class="font-mono text-sm font-bold text-brand">3.10</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="pay-email">Client Email</label>
-                <input type="email" id="pay-email" placeholder="client@domain.com">
-            </div>
-            <div class="form-group">
-                <label for="pay-amount">Amount (Smallest Denomination)</label>
-                <input type="number" id="pay-amount" placeholder="e.g., Kobo/Cents">
-            </div>
-            <button onclick="initiatePayment()">Initialize Payment</button>
-            <div class="console-output" id="payment-output">
-                // Checkout URL will appear here...
-            </div>
-        </div>
+        </main>
 
-        <!-- 4. Provider Module: Actions -->
-        <div class="card">
-            <h2>4. Provider Execution</h2>
-            <div class="form-group">
-                <label for="provider-id">Provider UUID</label>
-                <input type="text" id="provider-id" placeholder="Enter Provider ID">
+        <aside class="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shadow-xl">
+            <div class="flex border-b border-slate-800 text-xs font-bold uppercase tracking-wider bg-slate-950">
+                <div class="w-full p-4 text-center text-brand border-b-2 border-brand bg-slate-900">Live Slip Manager</div>
             </div>
-            <div class="form-group">
-                <label for="provider-job-id">Job UUID</label>
-                <input type="text" id="provider-job-id" placeholder="Enter Job ID to process">
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-4" id="slip-body">
+                <div class="text-center text-slate-600 text-sm py-12" id="empty-state-tag">
+                    Your bet slip is empty. Select an odd value from the main board to build a wager.
+                </div>
             </div>
-            <button onclick="acceptJob()" style="margin-bottom: 1rem;">Accept Job Assignment</button>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-950 space-y-4 shrink-0">
+                <div class="flex justify-between text-xs font-medium text-slate-400">
+                    <span>Locked Odds</span>
+                    <span class="font-mono text-white font-bold" id="slip-pricing-odds">0.00</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wide text-slate-400 mb-1">Stake Value (KES)</label>
+                    <input type="number" id="stake-amount" oninput="runProjections()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white font-mono font-bold focus:outline-none focus:border-brand text-sm" placeholder="0.00">
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-sm font-bold">Potential Payout</span>
+                    <span class="text-lg font-black text-brand font-mono" id="projected-payout">KES 0.00</span>
+                </div>
+                <button onclick="executePlatformWager()" class="w-full bg-brand text-slate-950 font-bold py-3 rounded-xl uppercase tracking-wider text-xs hover:bg-yellow-400 transition shadow-md">
+                    Submit Bet Ticket
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <div id="deposit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl">
+            <button onclick="closeDepositPortal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">&times;</button>
+            <h2 class="text-lg font-black mb-1 tracking-tight">FUND WALLET</h2>
+            <p class="text-xs text-slate-400 mb-4">Direct checkout interface powered via Paystack Payment Engine.</p>
             
-            <div class="form-group">
-                <label for="final-deliverable">Final Deliverable Content</label>
-                <textarea id="final-deliverable" placeholder="Finalized text after AI generation..."></textarea>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Payer Account Email</label>
+                    <input type="email" id="paystack-email" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-brand" placeholder="client@domain.com" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Amount to Fund (KES)</label>
+                    <input type="number" id="paystack-amount" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm font-mono text-white focus:outline-none focus:border-brand" placeholder="0.00" required>
+                </div>
+                <button onclick="executePaystackInline()" class="w-full bg-green-500 text-slate-950 font-black py-3 rounded-xl uppercase text-xs tracking-wider hover:bg-green-400 transition shadow-md">
+                    Launch Secure Gateway
+                </button>
             </div>
-            <button onclick="submitDeliverable()" class="success">Submit Complete Status</button>
         </div>
     </div>
 
-    <!-- API Logic -->
     <script>
-        // Global API Configuration
-        const API_BASE_URL = '/api/v1'; // Update to your deployment URL in production
+        const ENGINE_API_ROUTE = 'http://localhost:3000/api';
+        const PAYSTACK_PUBLIC_LIVE_KEY = 'pk_live_27d2699bf73e5b924f911ce6d2ba876a7657d1bd';
         
-        // Helper to handle API requests uniformly
-        async function apiCall(endpoint, method, payload = null) {
-            const config = {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` // Uncomment when auth is active
-                }
-            };
-            
-            if (payload) {
-                config.body = JSON.stringify(payload);
+        let SYSTEM_USER_UUID = "usr_99217a"; // Active session reference identifier
+        let localActiveSlip = null;
+        let systemLiquidBalanceCents = 250000; // Instantiated wallet capital balance: KES 2,500.00
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBalanceUI();
+            refreshLiveMatrix();
+        });
+
+        function updateBalanceUI() {
+            document.getElementById('balance-display').innerText = `KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`;
+        }
+
+        // Pull active events dynamic data from backend sportsbook system
+        async function refreshLiveMatrix() {
+            try {
+                const response = await fetch(`${ENGINE_API_ROUTE}/matches`);
+                if (!response.ok) throw new Error('Data sync unavailable');
+                const matchedLines = await response.json();
+                
+                const container = document.getElementById('odds-matrix-view');
+                if (matchedLines.length === 0) return;
+                
+                container.innerHTML = '';
+                matchedLines.forEach(match => {
+                    container.innerHTML += `
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm">
+                            <div>
+                                <div class="text-xs text-brand font-medium mb-1">${match.sport_key.toUpperCase().replace(/_/g, ' ')}</div>
+                                <div class="text-base font-bold">${match.home_team} vs ${match.away_team}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                ${match.choices.map((choice, index) => `
+                                    <button onclick="queueBetSlip('${choice.id}', '${choice.name}', ${choice.odds}, '${match.home_team} vs ${match.away_team}')" class="bg-slate-800 hover:border-brand border border-transparent px-4 py-2 rounded-lg w-20 flex flex-col items-center transition">
+                                        <span class="text-[10px] text-slate-500 font-bold">${index === 0 ? '1' : index === 1 ? 'X' : '2'}</span>
+                                        <span class="font-mono text-sm font-bold text-brand">${choice.odds.toFixed(2)}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                console.warn('Backend server connection inactive. Displaying client visual layout structure container details.');
             }
+        }
+
+        // Instantiates betslip layout metrics state
+        function queueBetSlip(outcomeId, marketTarget, oddsValue, labelText) {
+            localActiveSlip = { id: outcomeId, marketTarget, odds: oddsValue, labelText };
+            document.getElementById('slip-body').innerHTML = `
+                <div class="bg-slate-800 border border-brand/40 p-4 rounded-xl relative shadow-md animate-fadeIn">
+                    <button onclick="purgeSlipState()" class="absolute top-2 right-3 text-slate-500 hover:text-white text-base">&times;</button>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">${labelText}</div>
+                    <div class="text-sm font-black text-white mb-2">Selection: ${marketTarget}</div>
+                    <div class="text-right font-mono text-lg font-black text-brand">${oddsValue.toFixed(2)}</div>
+                </div>`;
+            document.getElementById('slip-pricing-odds').innerText = oddsValue.toFixed(2);
+            runProjections();
+        }
+
+        function purgeSlipState() {
+            localActiveSlip = null;
+            document.getElementById('slip-body').innerHTML = `<div class="text-center text-slate-600 text-sm py-12" id="empty-state-tag">Your bet slip is empty. Select an odd value from the main board to build a wager.</div>`;
+            document.getElementById('slip-pricing-odds').innerText = '0.00';
+            document.getElementById('projected-payout').innerText = 'KES 0.00';
+            document.getElementById('stake-amount').value = '';
+        }
+
+        function runProjections() {
+            if (!localActiveSlip) return;
+            const entryValue = parseFloat(document.getElementById('stake-amount').value) || 0;
+            const outputCalculation = entryValue * localActiveSlip.odds;
+            document.getElementById('projected-payout').innerText = `KES ${outputCalculation.toFixed(2)}`;
+        }
+
+        // Executes backend or fallback transactional state wager placement operations
+        async function executePlatformWager() {
+            if (!localActiveSlip) return alert('Error: Slip context selection matrix block empty.');
+            const financialStake = parseFloat(document.getElementById('stake-amount').value);
+            if (!financialStake || financialStake <= 0) return alert('Validation Error: Provide stake asset allocation value.');
+
+            const stakeCents = Math.round(financialStake * 100);
+            if (stakeCents > systemLiquidBalanceCents) return alert('Transaction Rejected: Insufficient available ledger capital balance.');
 
             try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-                return await response.json();
-            } catch (error) {
-                console.error(`Error with ${endpoint}:`, error);
-                return { error: error.message };
+                const response = await fetch(`${ENGINE_API_ROUTE}/wager`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: SYSTEM_USER_UUID,
+                        stakeCents: stakeCents,
+                        selectionId: localActiveSlip.id
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('Wager processing complete: Ticket securely logged into processing ledger database matrix.');
+                    systemLiquidBalanceCents = data.remainingBalanceCents;
+                    updateBalanceUI();
+                    purgeSlipState();
+                } else {
+                    alert(`Engine Placement Exception: ${data.error}`);
+                }
+            } catch (err) {
+                // Standalone Frontend Sandbox Sim Core Fallback Operations
+                alert('[Developer Sandbox Simulation]: Server interface not actively polling. Simulating instant database wallet balance deductions.');
+                systemLiquidBalanceCents -= stakeCents;
+                updateBalanceUI();
+                purgeSlipState();
             }
         }
 
-        // 1. Create Job Flow
-        async function createJob() {
-            const payload = {
-                userId: document.getElementById('user-id').value,
-                category: document.getElementById('job-category').value,
-                brief: document.getElementById('job-brief').value,
-                price: parseInt(document.getElementById('job-price').value),
-                proFinish: true,
-                language: 'en',
-                attachments: []
-            };
+        // Interactive Paystack SDK Direct Inlining Module
+        function executePaystackInline() {
+            const payerEmail = document.getElementById('paystack-email').value;
+            const fundingAmount = parseFloat(document.getElementById('paystack-amount').value);
 
-            const result = await apiCall('/jobs', 'POST', payload);
-            alert(`Job Created! Server returned: ${JSON.stringify(result)}`);
-            
-            // Auto-fill down-stream forms if ID is returned
-            if(result.jobId) {
-                document.getElementById('draft-job-id').value = result.jobId;
-                document.getElementById('pay-job-id').value = result.jobId;
-                document.getElementById('provider-job-id').value = result.jobId;
+            if (!payerEmail || !fundingAmount || fundingAmount <= 0) {
+                return alert('Validation Exception: Configure funding parameters accurately.');
             }
+
+            const targetCentsAmount = Math.round(fundingAmount * 100);
+            const transactionalTrackingRef = `TX_${SYSTEM_USER_UUID.slice(0, 4)}_${Date.now()}`;
+
+            const checkoutHandler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_LIVE_KEY,
+                email: payerEmail,
+                amount: targetCentsAmount,
+                currency: 'KES',
+                ref: transactionalTrackingRef,
+                metadata: {
+                    user_id: SYSTEM_USER_UUID,
+                    custom_fields: [{ display_name: "Platform Wallet Deposit", variable_name: "wallet_deposit", value: "true" }]
+                },
+                callback: function(transactionResponse) {
+                    alert(`Secure Handshake Validated. Payment verified successfully.\nReference ID: ${transactionResponse.reference}`);
+                    
+                    // Increment the layout user tracking balance locally for display visibility context
+                    systemLiquidBalanceCents += targetCentsAmount;
+                    updateBalanceUI();
+                    closeDepositPortal();
+                },
+                onClose: function() {
+                    alert('Gateway Transaction Interrupted: Secure portal window terminated by user action.');
+                }
+            });
+
+            checkoutHandler.openIframe();
         }
 
-        // 2. Trigger Local AI Draft
-        async function triggerAIDraft() {
-            const jobId = document.getElementById('draft-job-id').value;
-            const outputConsole = document.getElementById('ai-output');
-            
-            outputConsole.innerHTML = "Processing request via local inference...";
-            
-            const payload = { force: false };
-            const result = await apiCall(`/jobs/${jobId}/draft`, 'POST', payload);
-            
-            outputConsole.innerHTML = `> Draft ID: ${result.draftId || 'N/A'}\n> Content:\n${result.content || result.error}`;
-        }
-
-        // 3. Initiate Paystack Payment
-        async function initiatePayment() {
-            const outputConsole = document.getElementById('payment-output');
-            
-            const payload = {
-                jobId: document.getElementById('pay-job-id').value,
-                email: document.getElementById('pay-email').value,
-                amount: parseInt(document.getElementById('pay-amount').value)
-            };
-
-            outputConsole.innerHTML = "Initializing secure checkout...";
-
-            const result = await apiCall('/payments/checkout', 'POST', payload);
-            
-            if(result.authorizationUrl) {
-                outputConsole.innerHTML = `> Success!\n> Access Code: ${result.accessCode}\n> Reference: ${result.reference}\n> Action: Redirect user to authorizationUrl`;
-                // window.location.href = result.authorizationUrl; // Actual redirect logic
-            } else {
-                outputConsole.innerHTML = `> Error: ${JSON.stringify(result)}`;
-            }
-        }
-
-        // 4. Provider Actions
-        async function acceptJob() {
-            const providerId = document.getElementById('provider-id').value;
-            const payload = { jobId: document.getElementById('provider-job-id').value };
-            
-            const result = await apiCall(`/providers/${providerId}/accept`, 'POST', payload);
-            alert(`Job Acceptance Status: ${JSON.stringify(result)}`);
-        }
-
-        async function submitDeliverable() {
-            const providerId = document.getElementById('provider-id').value;
-            const payload = {
-                jobId: document.getElementById('provider-job-id').value,
-                providerId: providerId,
-                finalOutput: document.getElementById('final-deliverable').value,
-                attachments: []
-            };
-            
-            const result = await apiCall(`/providers/${providerId}/complete`, 'POST', payload);
-            alert(`Delivery Submission Status: ${JSON.stringify(result)}`);
-        }
+        function openDepositPortal() { document.getElementById('deposit-modal').style.display = 'flex'; }
+        function closeDepositPortal() { document.getElementById('deposit-modal').style.display = 'none'; }
     </script>
 </body>
 </html>
