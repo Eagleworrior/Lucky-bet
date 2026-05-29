@@ -44,7 +44,9 @@
     </div>
 
     <script>
-        const ENGINE_API_ROUTE = 'http://localhost:3000/api';
+        // IF RUNNING LOCALLY: 'http://localhost:3000/api'
+        // IF DEPLOYED: 'https://your-backend-url.com/api'
+        const ENGINE_API_ROUTE = 'http://localhost:3000/api'; 
         let SYSTEM_USER_UUID = "usr_faith_mbatia"; 
         let systemLiquidBalanceCents = 0; 
         let localActiveSlip = null;
@@ -61,13 +63,17 @@
                 const data = await response.json();
                 systemLiquidBalanceCents = data.balanceCents || 0;
                 document.getElementById('balance-display').innerText = `KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`;
-            } catch (e) { console.error("Balance sync failed"); }
+            } catch (e) { 
+                console.error("Balance sync failed"); 
+                document.getElementById('balance-display').innerText = "KES 0.00";
+            }
         }
 
         async function fetchAndRenderLiveMatrix() {
             const container = document.getElementById('odds-matrix-view');
             try {
                 const response = await fetch(`${ENGINE_API_ROUTE}/matches`);
+                if (!response.ok) throw new Error();
                 const matches = await response.json();
                 
                 if (matches.length === 0) {
@@ -108,7 +114,6 @@
         async function executePlatformWager() {
             if (!localActiveSlip) return alert('Select an outcome.');
             const stake = parseFloat(document.getElementById('stake-input').value) * 100;
-            
             if (stake > systemLiquidBalanceCents) return alert('Insufficient funds.');
 
             const response = await fetch(`${ENGINE_API_ROUTE}/wager`, {
@@ -117,9 +122,12 @@
                 body: JSON.stringify({ userId: SYSTEM_USER_UUID, stakeCents: stake, selectionId: localActiveSlip.id })
             });
             
-            if ((await response.json()).success) {
+            const result = await response.json();
+            if (result.success) {
                 alert('Wager Placed!');
                 syncUserBalanceFromServer();
+            } else {
+                alert('Error: ' + result.error);
             }
         }
     </script>
