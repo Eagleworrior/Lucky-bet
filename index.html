@@ -2,134 +2,72 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUCKY BET | Live Sports Engine</title>
+    <title>LUCKY BET | Integrated Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://js.paystack.co/v1/inline.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050811; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050811; color: white; }
     </style>
 </head>
-<body class="text-slate-100 h-screen flex flex-col overflow-hidden">
-
-    <header class="bg-[#090f1c] border-b border-slate-800 px-6 py-3 flex justify-between items-center shrink-0">
-        <h1 class="text-2xl font-black bg-gradient-to-r from-white to-emerald-400 bg-clip-text text-transparent">LUCKY BET</h1>
-        <div class="bg-[#0d1527] px-4 py-1.5 rounded-xl border border-slate-800">
-            <span class="text-[9px] text-slate-400 uppercase font-bold">Balance</span>
-            <div class="font-mono text-luckyGreen font-black" id="balance-display">KES 0.00</div>
+<body class="p-6">
+    <header class="flex justify-between items-center mb-8 bg-[#090f1c] p-4 rounded-2xl border border-slate-800">
+        <h1 class="text-2xl font-black text-emerald-400">LUCKY BET</h1>
+        <div class="text-right">
+            <p class="text-[9px] text-slate-400 uppercase font-bold">Wallet Balance</p>
+            <div id="balance-display" class="text-luckyGreen font-mono font-black">KES 0.00</div>
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
-        <main class="flex-1 p-6 overflow-y-auto">
-            <div class="bg-[#0d1527] p-1.5 rounded-2xl grid grid-cols-3 max-w-xl mb-6 border border-slate-800">
-                <button onclick="switchTimeframe('live')" class="py-2 text-xs font-black text-luckyGreen">LIVE</button>
-                <button onclick="switchTimeframe('upcoming')" class="py-2 text-xs font-black text-slate-400">UPCOMING</button>
-                <button onclick="switchTimeframe('results')" class="py-2 text-xs font-black text-slate-400">RESULTS</button>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="game-list" class="md:col-span-2 space-y-3">
+            <h2 class="text-sm font-bold text-slate-500 uppercase">Live Matches</h2>
             </div>
-            
-            <div id="odds-matrix-view" class="space-y-3">
-                <div class="text-center py-20 text-slate-500 font-bold animate-pulse">Syncing real-time market data...</div>
-            </div>
-        </main>
 
-        <aside class="w-80 bg-[#090f1c] border-l border-slate-800 p-4 flex flex-col">
-            <h3 class="text-xs font-black uppercase text-white mb-4">Wager Slip</h3>
-            <div id="slip-body" class="flex-1">
-                <div class="text-center text-slate-500 text-xs py-10">No selections made.</div>
-            </div>
-            <button onclick="executePlatformWager()" class="w-full bg-emerald-500 text-slate-950 font-black py-4 rounded-xl">SUBMIT WAGER</button>
-        </aside>
+        <div class="bg-[#090f1c] p-6 rounded-2xl border border-slate-800 h-fit">
+            <h3 class="text-xs font-black uppercase mb-4">Wager Slip</h3>
+            <div id="slip-area" class="text-slate-500 text-xs mb-4">No selections made.</div>
+            <button onclick="placeBet()" class="w-full bg-emerald-500 text-black font-black py-3 rounded-xl hover:bg-emerald-400">PLACE WAGER</button>
+        </div>
     </div>
 
     <script>
-        // IF RUNNING LOCALLY: 'http://localhost:3000/api'
-        // IF DEPLOYED: 'https://your-backend-url.com/api'
-        const ENGINE_API_ROUTE = 'http://localhost:3000/api'; 
-        let SYSTEM_USER_UUID = "usr_faith_mbatia"; 
-        let systemLiquidBalanceCents = 0; 
-        let localActiveSlip = null;
+        // --- VIRTUAL BACKEND ENGINE ---
+        // This replaces the need for a separate server.js for now.
+        const mockDatabase = {
+            balanceCents: 50000,
+            matches: [
+                { id: "m1", league: "Premier League", home: "Chelsea", away: "Arsenal", odds: 2.10 },
+                { id: "m2", league: "La Liga", home: "Real Madrid", away: "Barcelona", odds: 1.95 }
+            ]
+        };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            syncUserBalanceFromServer();
-            fetchAndRenderLiveMatrix();
-            setInterval(fetchAndRenderLiveMatrix, 30000);
-        });
-
-        async function syncUserBalanceFromServer() {
-            try {
-                const response = await fetch(`${ENGINE_API_ROUTE}/user/balance?userId=${SYSTEM_USER_UUID}`);
-                const data = await response.json();
-                systemLiquidBalanceCents = data.balanceCents || 0;
-                document.getElementById('balance-display').innerText = `KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`;
-            } catch (e) { 
-                console.error("Balance sync failed"); 
-                document.getElementById('balance-display').innerText = "KES 0.00";
-            }
-        }
-
-        async function fetchAndRenderLiveMatrix() {
-            const container = document.getElementById('odds-matrix-view');
-            try {
-                const response = await fetch(`${ENGINE_API_ROUTE}/matches`);
-                if (!response.ok) throw new Error();
-                const matches = await response.json();
-                
-                if (matches.length === 0) {
-                    container.innerHTML = `<div class="text-center text-slate-500 text-sm">No matches available.</div>`;
-                    return;
-                }
-
-                container.innerHTML = matches.map(match => `
-                    <div class="bg-[#0d1527] border border-slate-800 p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <div class="text-xs font-bold text-slate-400">${match.league}</div>
-                            <div class="font-bold">${match.home_team} vs ${match.away_team}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            ${match.choices.map(c => `
-                                <button onclick="queueBetSlip('${c.id}', ${c.odds}, '${match.home_team} vs ${match.away_team}')" 
-                                    class="bg-[#050811] px-4 py-2 rounded-lg border border-slate-700 text-xs font-mono font-black text-luckyGreen">
-                                    ${c.odds.toFixed(2)}
-                                </button>`).join('')}
-                        </div>
+        // Render UI
+        function loadUI() {
+            document.getElementById('balance-display').innerText = `KES ${(mockDatabase.balanceCents / 100).toFixed(2)}`;
+            const list = document.getElementById('game-list');
+            list.innerHTML = mockDatabase.matches.map(m => `
+                <div class="bg-[#0d1527] p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                        <div class="text-[10px] text-emerald-500 font-bold">${m.league}</div>
+                        <div class="font-bold">${m.home} vs ${m.away}</div>
                     </div>
-                `).join('');
-            } catch (e) {
-                container.innerHTML = `<div class="text-center text-red-400 text-sm">Backend API Offline.</div>`;
-            }
+                    <button onclick="selectBet('${m.id}', ${m.odds})" class="bg-black border border-slate-700 px-4 py-2 rounded-lg text-emerald-400 font-mono font-bold">
+                        ${m.odds.toFixed(2)}
+                    </button>
+                </div>
+            `).join('');
         }
 
-        function queueBetSlip(id, odds, label) {
-            localActiveSlip = { id, odds, label };
-            document.getElementById('slip-body').innerHTML = `
-                <div class="bg-[#0d1527] p-3 rounded-lg border border-emerald-500/30">
-                    <div class="text-xs font-bold text-white">${label}</div>
-                    <div class="text-luckyGreen font-mono font-black mt-2">Odds: ${odds.toFixed(2)}</div>
-                    <input type="number" id="stake-input" placeholder="Stake KES" class="w-full mt-3 bg-black p-2 rounded border border-slate-800 text-white">
-                </div>`;
+        function selectBet(id, odds) {
+            document.getElementById('slip-area').innerHTML = `Selected Odds: <span class="text-white">${odds.toFixed(2)}</span>`;
         }
 
-        async function executePlatformWager() {
-            if (!localActiveSlip) return alert('Select an outcome.');
-            const stake = parseFloat(document.getElementById('stake-input').value) * 100;
-            if (stake > systemLiquidBalanceCents) return alert('Insufficient funds.');
-
-            const response = await fetch(`${ENGINE_API_ROUTE}/wager`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: SYSTEM_USER_UUID, stakeCents: stake, selectionId: localActiveSlip.id })
-            });
-            
-            const result = await response.json();
-            if (result.success) {
-                alert('Wager Placed!');
-                syncUserBalanceFromServer();
-            } else {
-                alert('Error: ' + result.error);
-            }
+        function placeBet() {
+            alert("Success: Wager placed against virtual engine!");
+            mockDatabase.balanceCents -= 1000; // Deduct 10 KES
+            loadUI();
         }
+
+        loadUI();
     </script>
 </body>
 </html>
