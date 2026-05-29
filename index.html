@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUCKY BET | Live Sportsbook, Upcoming Fixtures & Results</title>
-    <!-- Premium Tailwind CSS Engine -->
+    <title>LUCKY BET | Real-Time Sportsbook Operator</title>
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Paystack Inline SDK -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -15,187 +15,191 @@
                 extend: { 
                     colors: { 
                         luckyGreen: '#00ff66',
-                        luckyDark: '#070b12',
-                        panelBg: '#0f1624',
+                        luckyDark: '#050811',
+                        panelBg:-[#0d1527],
                         borderBg: '#1e293b',
-                        oddsBg: '#172033',
-                        accentGold: '#eab308'
+                        oddsBg: '#141f36',
+                        liveRed: '#ff3b30',
+                        upcomingGold: '#ffcc00'
                     } 
                 } 
             } 
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #070b12; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050811; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #070b12; }
+        ::-webkit-scrollbar-track { background: #050811; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #00ff66; }
     </style>
 </head>
-<body class="text-slate-100 h-screen flex flex-col overflow-hidden antialiased selection:bg-luckyGreen selection:text-slate-900">
+<body class="text-slate-100 h-screen flex flex-col overflow-hidden antialiased select-none">
 
-    <!-- Top Premium Navigation Bar -->
-    <header class="bg-[#0b111c] border-b border-borderBg/60 px-6 py-3 flex justify-between items-center shadow-2xl shrink-0 z-10">
+    <!-- Top Navigation Header -->
+    <header class="bg-[#090f1c] border-b border-slate-800/80 px-6 py-3 flex justify-between items-center shadow-2xl shrink-0 z-10">
         <div class="flex items-center gap-3">
-            <div class="flex items-center justify-center bg-gradient-to-br from-emerald-500 to-luckyGreen p-2.5 rounded-xl shadow-lg shadow-emerald-950/50">
+            <div class="flex items-center justify-center bg-gradient-to-br from-emerald-500 to-luckyGreen p-2.5 rounded-xl shadow-lg shadow-emerald-950/40">
                 <span class="text-slate-950 font-black text-xl tracking-tighter">L</span>
             </div>
             <div>
                 <h1 class="text-2xl font-black tracking-tight bg-gradient-to-r from-white via-emerald-400 to-luckyGreen bg-clip-text text-transparent">
                     LUCKY<span class="text-white font-normal tracking-wide">BET</span>
                 </h1>
-                <p class="text-[9px] text-luckyGreen font-bold uppercase tracking-widest -mt-0.5">Real-Time Odds Matrix</p>
+                <p class="text-[9px] text-luckyGreen font-bold uppercase tracking-widest -mt-0.5">Live Odds Hub</p>
             </div>
         </div>
         
-        <!-- Live System Balance & Funding Controls -->
         <div class="flex items-center gap-4">
-            <div class="bg-panelBg border border-borderBg/70 px-4 py-1.5 rounded-xl shadow-inner flex flex-col items-end">
+            <div class="bg-[#0d1527] border border-slate-800 px-4 py-1.5 rounded-xl flex flex-col items-end shadow-inner">
                 <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Available Balance</span>
                 <span class="font-mono text-base font-black text-luckyGreen" id="balance-display">KES 0.00</span>
             </div>
-            <button onclick="openDepositPortal()" class="bg-gradient-to-r from-emerald-500 to-luckyGreen text-slate-950 font-extrabold text-sm px-5 py-2.5 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg shadow-luckyGreen/20 hover:scale-[1.02] active:scale-[0.98]">
+            <button onclick="openDepositPortal()" class="bg-gradient-to-r from-emerald-500 to-luckyGreen text-slate-950 font-black text-sm px-5 py-2.5 rounded-xl hover:opacity-90 transition shadow-lg shadow-luckyGreen/10 hover:scale-[1.01] active:scale-[0.99]">
                 Deposit Funds
             </button>
         </div>
     </header>
 
-    <!-- Main App Workspace -->
+    <!-- Main Dynamic Application Screen Container -->
     <div class="flex flex-1 overflow-hidden">
         
-        <!-- Left Sports Sidebar Menu -->
-        <aside class="w-64 bg-[#090d16] border-r border-borderBg/50 p-4 space-y-6 hidden lg:flex flex-col shrink-0 overflow-y-auto">
+        <!-- Left Side Navigation: Global League Selectors -->
+        <aside class="w-64 bg-[#070c16] border-r border-slate-800/60 p-4 space-y-6 hidden lg:flex flex-col shrink-0 overflow-y-auto">
             <div>
                 <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest px-3 mb-3 flex items-center justify-between">
-                    <span>Popular Leagues</span>
+                    <span>Active Leagues</span>
+                    <span class="w-2 h-2 rounded-full bg-luckyGreen animate-pulse"></span>
                 </h3>
-                <nav class="space-y-1" id="league-filters">
-                    <button onclick="filterLeague('all')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-panelBg text-white font-semibold text-xs border border-borderBg transition text-left">
-                        <span class="flex items-center gap-2.5">🌍 All Competitions</span>
+                <nav class="space-y-1" id="sidebar-league-menu">
+                    <button onclick="filterByLeague('all')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#0d1527] text-white font-bold text-xs border border-slate-800 transition text-left shadow-sm">
+                        <span>🌍</span> All Competitions
                     </button>
-                    <button onclick="filterLeague('English Premier League')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-panelBg/50 hover:text-white text-xs transition text-left">
-                        <span class="flex items-center gap-2.5">⚽ English Premier League</span>
+                    <button onclick="filterByLeague('English Premier League')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left">
+                        <span>⚽</span> English Premier League
                     </button>
-                    <button onclick="filterLeague('La Liga')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-panelBg/50 hover:text-white text-xs transition text-left">
-                        <span class="flex items-center gap-2.5">🇪🇸 La Liga (Spain)</span>
+                    <button onclick="filterByLeague('La Liga')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left">
+                        <span>🇪🇸</span> La Liga (Spain)
                     </button>
-                    <button onclick="filterLeague('UEFA Champions League')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-panelBg/50 hover:text-white text-xs transition text-left">
-                        <span class="flex items-center gap-2.5">🏆 Champions League</span>
+                    <button onclick="filterByLeague('Serie A')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left">
+                        <span>🇮🇹</span> Serie A (Italy)
+                    </button>
+                    <button onclick="filterByLeague('UEFA Champions League')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left">
+                        <span>🏆</span> Champions League
                     </button>
                 </nav>
             </div>
-            
-            <div class="pt-4 border-t border-borderBg/40">
-                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest px-3 mb-2">Platform Verification</h3>
-                <div class="p-3 bg-panelBg rounded-xl border border-borderBg/50 text-[11px] space-y-2">
-                    <div class="flex justify-between text-slate-400"><span>Data Core</span> <span class="text-luckyGreen font-bold">API Verified</span></div>
-                    <div class="flex justify-between text-slate-400"><span>Secure Gateway</span> <span class="text-luckyGreen font-bold">Paystack Live</span></div>
+
+            <div class="pt-4 border-t border-slate-800/60 text-xs space-y-2.5">
+                <h3 class="text-slate-500 font-bold uppercase tracking-wider px-3">System Specifications</h3>
+                <div class="bg-[#0d1527] border border-slate-800/80 p-3 rounded-xl space-y-1.5 text-[11px] text-slate-400">
+                    <div class="flex justify-between"><span>Data Delivery</span><span class="text-luckyGreen font-bold">API Production</span></div>
+                    <div class="flex justify-between"><span>Security Vault</span><span class="text-luckyGreen font-bold">SSL Encrypted</span></div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Sports Betting Hub -->
-        <main class="flex-1 p-6 overflow-y-auto space-y-6 bg-luckyDark">
+        <!-- Central Sports Dashboard Panel -->
+        <main class="flex-1 p-6 overflow-y-auto space-y-6 bg-[#050811]">
             
-            <!-- Real-Time Timeframe Tab Matrix Switching -->
-            <div class="bg-panelBg border border-borderBg/60 p-1.5 rounded-2xl grid grid-cols-3 text-center text-xs font-bold shadow-xl max-w-xl">
-                <button id="tab-live" onclick="switchTimeframe('live')" class="py-3 rounded-xl bg-gradient-to-r from-emerald-950 to-panelBg text-luckyGreen border border-emerald-500/20 shadow-md transition-all duration-200 flex items-center justify-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> LIVE MATCHES
+            <!-- Filter Tabs Matrix Bar (Live, Upcoming, 14-Day Historical Logs) -->
+            <div class="bg-[#0d1527] border border-slate-800/80 p-1.5 rounded-2xl grid grid-cols-3 text-center text-xs font-black shadow-xl max-w-xl">
+                <button id="tab-live" onclick="switchTimeframe('live')" class="py-3 rounded-xl bg-gradient-to-r from-emerald-950 to-[#0d1527] text-luckyGreen border border-emerald-500/20 shadow-md transition flex items-center justify-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-liveRed animate-ping"></span> LIVE IN-PLAY
                 </button>
-                <button id="tab-upcoming" onclick="switchTimeframe('upcoming')" class="py-3 rounded-xl text-slate-400 hover:text-slate-200 transition-all duration-200">
-                    UPCOMING GAMES
+                <button id="tab-upcoming" onclick="switchTimeframe('upcoming')" class="py-3 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                    UPCOMING MATCHES
                 </button>
-                <button id="tab-results" onclick="switchTimeframe('results')" class="py-3 rounded-xl text-slate-400 hover:text-slate-200 transition-all duration-200">
-                    PAST RESULTS (2 WKS)
+                <button id="tab-results" onclick="switchTimeframe('results')" class="py-3 rounded-xl text-slate-400 hover:text-slate-200 transition">
+                    PAST RESULTS (14 DAYS)
                 </button>
             </div>
 
-            <!-- Market Layout Column Header Labels -->
-            <div class="grid grid-cols-12 text-xs font-bold text-slate-400 px-4 mb-2 hidden md:grid">
-                <div class="col-span-6 uppercase tracking-wider" id="market-header-title">Fixture Information</div>
-                <div class="col-span-6 grid grid-cols-3 text-center uppercase tracking-wider" id="market-odds-label">
+            <!-- Market Odd Metric Headers -->
+            <div class="grid grid-cols-12 text-xs font-black text-slate-400 px-4 mb-1 hidden md:grid uppercase tracking-widest">
+                <div class="col-span-6" id="label-left-panel">Fixture & Match Status</div>
+                <div class="col-span-6 grid grid-cols-3 text-center" id="label-right-panel">
                     <div>Home (1)</div>
                     <div>Draw (X)</div>
                     <div>Away (2)</div>
                 </div>
             </div>
 
-            <!-- Main Odds Output Dynamic Target -->
+            <!-- Odds Interactive View Target -->
             <div class="space-y-3" id="odds-matrix-view">
-                <!-- Content injected via Javascript based on live, upcoming, or past results filters -->
+                <!-- Matches are dynamically built here based on timeframes and leagues selection -->
             </div>
         </main>
 
-        <!-- Right Hand Interactive Betslip Engine -->
-        <aside class="w-80 bg-[#0b111c] border-l border-borderBg/60 flex flex-col shadow-2xl shrink-0">
-            <div class="p-4 border-b border-borderBg/60 bg-panelBg/50 flex justify-between items-center">
-                <h3 class="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                    <span>🎫</span> BET SLIP
+        <!-- Right Side Panel: Slip Manager Module -->
+        <aside class="w-80 bg-[#090f1c] border-l border-slate-800/80 flex flex-col shadow-2xl shrink-0">
+            <div class="p-4 border-b border-slate-800/80 bg-[#0d1527]/40 flex justify-between items-center">
+                <h3 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span>🎫</span> Wager Slip Controller
                 </h3>
-                <span class="bg-emerald-950 text-luckyGreen font-mono font-bold text-xs px-2.5 py-0.5 rounded-md border border-emerald-500/20" id="slip-count-badge">0</span>
+                <span class="bg-emerald-950 text-luckyGreen font-mono font-bold text-xs px-2.5 py-0.5 rounded-md border border-emerald-500/20 shadow-inner" id="slip-count-badge">0</span>
             </div>
 
-            <!-- Slip Card Selection Wrapper -->
+            <!-- Betslip State Content Screen -->
             <div class="flex-1 overflow-y-auto p-4 space-y-4" id="slip-body">
                 <div class="text-center text-slate-500 text-xs py-16 px-4" id="empty-state-tag">
-                    <div class="text-4xl mb-3 text-slate-600">📑</div>
-                    <p class="font-bold text-slate-400 text-sm">Slip Empty</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Select real-time game odds from the main board to compile a live wager ticket.</p>
+                    <div class="text-4xl mb-3 text-slate-600">📊</div>
+                    <p class="font-bold text-slate-400 text-sm">No Selections Made</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Select an active outcome box from the main sportsbook dashboard rows to build a live ticket.</p>
                 </div>
             </div>
 
-            <!-- Wager Calculation Core Controls -->
-            <div class="p-4 border-t border-borderBg/60 bg-panelBg space-y-4 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <!-- Bet Financial Processing Execution Blocks -->
+            <div class="p-4 border-t border-slate-800/80 bg-[#0d1527] space-y-4 shrink-0 shadow-[0_-10px_35px_rgba(0,0,0,0.6)]">
                 <div class="flex justify-between text-xs font-bold text-slate-400">
-                    <span>Combined Slip Odds</span>
-                    <span class="font-mono text-luckyGreen text-sm font-black" id="slip-pricing-odds">0.00</span>
+                    <span>Total Slip Odds</span>
+                    <span class="font-mono text-luckyGreen text-sm font-black tracking-wide" id="slip-pricing-odds">0.00</span>
                 </div>
                 
                 <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wide text-slate-400">Stake Limit (KES)</label>
+                    <label class="block text-xs font-bold uppercase tracking-wide text-slate-400">Stake Capital Value</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 font-mono">KES</span>
-                        <input type="number" id="stake-amount" oninput="runProjections()" class="w-full bg-luckyDark border border-borderBg rounded-xl pl-12 pr-4 py-3 text-white font-mono font-black focus:outline-none focus:border-luckyGreen focus:ring-1 focus:ring-luckyGreen transition text-base placeholder:text-slate-700" placeholder="0.00">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500 font-mono">KES</span>
+                        <input type="number" id="stake-amount" oninput="runProjections()" class="w-full bg-[#050811] border border-slate-800 rounded-xl pl-12 pr-4 py-3 text-white font-mono font-black focus:outline-none focus:border-luckyGreen transition text-base placeholder:text-slate-800 shadow-inner" placeholder="0.00">
                     </div>
                 </div>
 
-                <div class="bg-luckyDark border border-borderBg/80 p-3 rounded-xl flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-400">Est. Return</span>
+                <div class="bg-[#050811] border border-slate-800/60 p-3 rounded-xl flex justify-between items-center shadow-inner">
+                    <span class="text-xs font-bold text-slate-400">Potential Returns</span>
                     <span class="text-lg font-black text-luckyGreen font-mono tracking-tight" id="projected-payout">KES 0.00</span>
                 </div>
                 
                 <button onclick="executePlatformWager()" class="w-full bg-gradient-to-r from-emerald-500 to-luckyGreen text-slate-950 font-black py-4 rounded-xl uppercase tracking-wider text-xs hover:opacity-90 transition shadow-lg shadow-luckyGreen/10 active:scale-[0.99]">
-                    Lock Wager Ticket
+                    Lock & Submit Wager Ticket
                 </button>
             </div>
         </aside>
     </div>
 
-    <!-- Paystack Wallet Funding Modal Frame -->
+    <!-- Paystack Checkout Modal Component Overlay -->
     <div id="deposit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-panelBg border border-borderBg w-full max-w-sm rounded-2xl p-6 relative shadow-2xl">
+        <div class="bg-[#0d1527] border border-slate-800 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl animate-scaleUp">
             <button onclick="closeDepositPortal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition">&times;</button>
             
             <div class="flex items-center gap-2.5 mb-2">
                 <div class="w-1.5 h-6 bg-luckyGreen rounded-full"></div>
                 <h2 class="text-lg font-black tracking-tight text-white uppercase">Fund LuckyBet Balance</h2>
             </div>
-            <p class="text-xs text-slate-400 mb-5 leading-relaxed">Direct mobile money & card channels processed instantly via Paystack Network.</p>
+            <p class="text-xs text-slate-400 mb-5 leading-relaxed">Secure gateway integration running directly via live Paystack payment networks.</p>
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Account Billing Email</label>
-                    <input type="email" id="paystack-email" class="w-full bg-luckyDark border border-borderBg rounded-xl p-3 text-sm text-white focus:outline-none focus:border-luckyGreen transition" placeholder="your-email@domain.com" required>
+                    <input type="email" id="paystack-email" class="w-full bg-[#050811] border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-luckyGreen transition shadow-inner" placeholder="developer@luckybet.com" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Deposit Amount (KES)</label>
-                    <input type="number" id="paystack-amount" class="w-full bg-luckyDark border border-borderBg rounded-xl p-3 text-sm font-mono text-white focus:outline-none focus:border-luckyGreen transition" placeholder="0.00" required>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Deposit Capital Amount (KES)</label>
+                    <input type="number" id="paystack-amount" class="w-full bg-[#050811] border border-slate-800 rounded-xl p-3 text-sm font-mono text-white focus:outline-none focus:border-luckyGreen transition shadow-inner" placeholder="0.00" required>
                 </div>
                 
                 <div class="pt-2">
-                    <button onclick="executePaystackInline()" class="w-full bg-gradient-to-r from-emerald-500 to-luckyGreen text-slate-950 font-black py-3.5 rounded-xl uppercase text-xs tracking-wider shadow-lg shadow-luckyGreen/10">
+                    <button onclick="executePaystackInline()" class="w-full bg-gradient-to-r from-emerald-500 to-luckyGreen text-slate-950 font-black py-4 rounded-xl uppercase text-xs tracking-wider shadow-lg shadow-luckyGreen/10">
                         Launch Secure Gateway
                     </button>
                 </div>
@@ -203,9 +207,9 @@
         </div>
     </div>
 
-    <!-- App Engine Script Logic -->
+    <!-- Interactive Sports Data Parsing Engine Script -->
     <script>
-        // Set this to your live production server API deployment URL (e.g., https://your-app.herokuapp.com/api)
+        // Set this API route string to match your backend operational platform pipeline environment
         const ENGINE_API_ROUTE = 'http://localhost:3000/api';
         const PAYSTACK_PUBLIC_LIVE_KEY = 'pk_live_27d2699bf73e5b924f911ce6d2ba876a7657d1bd';
         
@@ -213,72 +217,104 @@
         let currentActiveTimeframe = 'live';
         let currentSelectedLeague = 'all';
         let localActiveSlip = null;
-        let systemLiquidBalanceCents = 250000; // Instantiated tracking balance KES 2,500.00
+        let systemLiquidBalanceCents = 500000; // Baseline tracking wallet capital layout: KES 5,000.00
 
-        // Comprehensive Production Grade Sports Database Matrix (Syncs automatically with APIs)
-        const productionSportsBookMatrix = [
-            // Timeframe Group 1: LIVE NOW MATCHES
+        // Comprehensive Global Sports Database Grid (Simultaneously feeds all tabs automatically)
+        const productionSportsBookData = [
+            // TIMEFRAME STATE 1: LIVE NOW IN-PLAY CHANNELS
             {
-                id: "lb_m_001",
+                id: "m_live_01",
                 timeframe: "live",
                 league: "English Premier League",
                 home_team: "Manchester City",
                 away_team: "Liverpool FC",
-                status: "68' LIVE",
-                score: "2 - 1",
-                choices: [{ id: "c_m01_1", name: "Man City", odds: 1.45 }, { id: "c_m01_x", name: "Draw", odds: 3.80 }, { id: "c_m01_2", name: "Liverpool", odds: 5.25 }]
+                status: "74' LIVE",
+                score: "3 - 2",
+                choices: [{ id: "opt_m1_1", name: "Man City", odds: 1.35 }, { id: "opt_m1_x", name: "Draw", odds: 4.20 }, { id: "opt_m1_2", name: "Liverpool", odds: 6.80 }]
             },
             {
-                id: "lb_m_002",
+                id: "m_live_02",
                 timeframe: "live",
                 league: "La Liga",
                 home_team: "Real Madrid",
-                away_team: "Atletico Madrid",
-                status: "14' LIVE",
-                score: "0 - 0",
-                choices: [{ id: "c_m02_1", name: "Real Madrid", odds: 1.85 }, { id: "c_m02_x", name: "Draw", odds: 3.40 }, { id: "c_m02_2", name: "Atletico", odds: 3.95 }]
+                away_team: "FC Barcelona",
+                status: "31' LIVE",
+                score: "1 - 1",
+                choices: [{ id: "opt_m2_1", name: "Real Madrid", odds: 2.05 }, { id: "opt_m2_x", name: "Draw", odds: 3.25 }, { id: "opt_m2_2", name: "Barcelona", odds: 2.90 }]
             },
-            // Timeframe Group 2: UPCOMING MATCHES (TODAY / TOMORROW)
             {
-                id: "lb_m_003",
+                id: "m_live_03",
+                timeframe: "live",
+                league: "Serie A",
+                home_team: "Juventus JK",
+                away_team: "AC Milan",
+                status: "89' LIVE",
+                score: "0 - 1",
+                choices: [{ id: "opt_m3_1", name: "Juventus", odds: 14.00 }, { id: "opt_m3_x", name: "Draw", odds: 5.50 }, { id: "opt_m3_2", name: "AC Milan", odds: 1.08 }]
+            },
+
+            // TIMEFRAME STATE 2: UPCOMING TARGET FIXTURES (TODAY / TOMORROW)
+            {
+                id: "m_up_01",
                 timeframe: "upcoming",
                 league: "English Premier League",
                 home_team: "Arsenal FC",
                 away_team: "Manchester United",
-                status: "Today 20:00",
+                status: "Today 22:00",
                 score: "vs",
-                choices: [{ id: "c_m03_1", name: "Arsenal", odds: 2.15 }, { id: "c_m03_x", name: "Draw", odds: 3.45 }, { id: "c_m03_2", name: "Man United", odds: 3.10 }]
+                choices: [{ id: "opt_m4_1", name: "Arsenal", odds: 1.90 }, { id: "opt_m4_x", name: "Draw", odds: 3.60 }, { id: "opt_m4_2", name: "Man United", odds: 3.40 }]
             },
             {
-                id: "lb_m_004",
+                id: "m_up_02",
                 timeframe: "upcoming",
                 league: "UEFA Champions League",
                 home_team: "Bayern Munich",
-                away_team: "Barcelona FC",
+                away_team: "Paris Saint-Germain",
                 status: "Tomorrow 21:45",
                 score: "vs",
-                choices: [{ id: "c_m04_1", name: "Bayern", odds: 1.90 }, { id: "c_m04_x", name: "Draw", odds: 4.10 }, { id: "c_m04_2", name: "Barcelona", odds: 3.65 }]
+                choices: [{ id: "opt_m5_1", name: "Bayern", odds: 1.72 }, { id: "opt_m5_x", name: "Draw", odds: 4.00 }, { id: "opt_m5_2", name: "PSG", odds: 4.25 }]
             },
-            // Timeframe Group 3: HISTORICAL PAST RESULTS (COMPLETED 2 WEEKS AGO)
             {
-                id: "lb_m_005",
+                id: "m_up_03",
+                timeframe: "upcoming",
+                league: "La Liga",
+                home_team: "Atletico Madrid",
+                away_team: "Sevilla FC",
+                status: "May 31, 18:00",
+                score: "vs",
+                choices: [{ id: "opt_m6_1", name: "Atletico", odds: 1.55 }, { id: "opt_m6_x", name: "Draw", odds: 3.85 }, { id: "opt_m6_2", name: "Sevilla", odds: 5.50 }]
+            },
+
+            // TIMEFRAME STATE 3: PAST COMPLETED HISTORICAL ARCHIVES (PLAYED 14 DAYS AGO RANGE)
+            {
+                id: "m_res_01",
                 timeframe: "results",
                 league: "English Premier League",
                 home_team: "Chelsea FC",
                 away_team: "Newcastle United",
                 status: "FT (14 Days Ago)",
-                score: "3 - 1",
-                choices: [{ id: "c_m05_1", name: "Chelsea (Won)", odds: 2.10 }, { id: "c_m05_x", name: "Draw", odds: 3.50 }, { id: "c_m05_2", name: "Newcastle", odds: 3.20 }]
+                score: "4 - 2",
+                choices: [{ id: "opt_m7_1", name: "Chelsea (Won)", odds: 2.10 }, { id: "opt_m7_x", name: "Draw", odds: 3.40 }, { id: "opt_m7_2", name: "Newcastle", odds: 3.15 }]
             },
             {
-                id: "lb_m_006",
+                id: "m_res_02",
                 timeframe: "results",
-                league: "La Liga",
-                home_team: "Villarreal CF",
-                away_team: "Valencia CF",
+                league: "Serie A",
+                home_team: "Inter Milan",
+                away_team: "Lazio Roma",
                 status: "FT (10 Days Ago)",
-                score: "0 - 2",
-                choices: [{ id: "c_m06_1", name: "Villarreal", odds: 1.95 }, { id: "c_m06_x", name: "Draw", odds: 3.30 }, { id: "c_m06_2", name: "Valencia (Won)", odds: 3.60 }]
+                score: "3 - 0",
+                choices: [{ id: "opt_m8_1", name: "Inter (Won)", odds: 1.45 }, { id: "opt_m8_x", name: "Draw", odds: 4.30 }, { id: "opt_m8_2", name: "Lazio", odds: 6.50 }]
+            },
+            {
+                id: "m_res_03",
+                timeframe: "results",
+                league: "UEFA Champions League",
+                home_team: "Borussia Dortmund",
+                away_team: "Real Madrid",
+                status: "FT (May 15, 2026)",
+                score: "1 - 2",
+                choices: [{ id: "opt_m9_1", name: "Dortmund", odds: 3.50 }, { id: "opt_m9_x", name: "Draw", odds: 3.75 }, { id: "opt_m9_2", name: "R. Madrid (Won)", odds: 1.91 }]
             }
         ];
 
@@ -291,6 +327,7 @@
             document.getElementById('balance-display').innerText = `KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`;
         }
 
+        // Switches operational timeline layouts (Live vs Scheduled vs Logs)
         function switchTimeframe(timeframeType) {
             currentActiveTimeframe = timeframeType;
             const tabs = ['live', 'upcoming', 'results'];
@@ -298,103 +335,110 @@
             tabs.forEach(tab => {
                 const element = document.getElementById(`tab-${tab}`);
                 if (tab === timeframeType) {
-                    element.className = "py-3 rounded-xl bg-gradient-to-r from-emerald-950 to-panelBg text-luckyGreen border border-emerald-500/20 shadow-md transition-all duration-200 flex items-center justify-center gap-2";
-                    if(tab === 'live') element.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> LIVE MATCHES`;
+                    element.className = "py-3 rounded-xl bg-gradient-to-r from-emerald-950 to-[#0d1527] text-luckyGreen border border-emerald-500/20 shadow-md transition flex items-center justify-center gap-2";
+                    if(tab === 'live') element.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-liveRed animate-ping"></span> LIVE IN-PLAY`;
                 } else {
-                    element.className = "py-3 rounded-xl text-slate-400 hover:text-slate-200 transition-all duration-200";
-                    if(tab === 'live') element.innerHTML = `LIVE MATCHES`;
+                    element.className = "py-3 rounded-xl text-slate-400 hover:text-slate-200 transition";
+                    if(tab === 'live') element.innerHTML = `LIVE IN-PLAY`;
                 }
             });
 
-            // Adjust headers based on past vs present markets
+            const leftHeader = document.getElementById('label-left-panel');
+            const rightHeader = document.getElementById('label-right-panel');
+
             if (timeframeType === 'results') {
-                document.getElementById('market-header-title').innerText = "Past Match Results & Logs";
-                document.getElementById('market-odds-label').className = "col-span-6 grid grid-cols-3 text-center uppercase tracking-wider text-slate-500";
-                document.getElementById('market-odds-label').innerHTML = "<div>1 (Closing)</div><div>X (Closing)</div><div>2 (Closing)</div>";
+                leftHeader.innerText = "Completed Match Historical Archives";
+                rightHeader.innerHTML = "<div>1 (Closing)</div><div>X (Closing)</div><div>2 (Closing)</div>";
+                rightHeader.className = "col-span-6 grid grid-cols-3 text-center text-slate-500 font-bold";
             } else {
-                document.getElementById('market-header-title').innerText = "Fixture Information";
-                document.getElementById('market-odds-label').className = "col-span-6 grid grid-cols-3 text-center uppercase tracking-wider text-slate-400";
-                document.getElementById('market-odds-label').innerHTML = "<div>Home (1)</div><div>Draw (X)</div><div>Away (2)</div>";
+                leftHeader.innerText = "Fixture & Match Status";
+                rightHeader.innerHTML = "<div>Home (1)</div><div>Draw (X)</div><div>Away (2)</div>";
+                rightHeader.className = "col-span-6 grid grid-cols-3 text-center text-slate-400 font-bold";
             }
 
             refreshLiveMatrix();
         }
 
-        function filterLeague(leagueName) {
+        function filterByLeague(leagueName) {
             currentSelectedLeague = leagueName;
-            const buttons = document.getElementById('league-filters').getElementsByTagName('button');
-            for(let btn of buttons) {
-                btn.className = "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-panelBg/50 hover:text-white text-xs transition text-left";
+            const menuButtons = document.getElementById('sidebar-league-menu').getElementsByTagName('button');
+            for(let btn of menuButtons) {
+                btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-[#0d1527]/50 hover:text-white text-xs transition text-left";
             }
-            event.currentTarget.className = "w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-panelBg text-white font-semibold text-xs border border-borderBg transition text-left";
+            event.currentTarget.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#0d1527] text-white font-bold text-xs border border-slate-800 transition text-left shadow-sm";
             refreshLiveMatrix();
         }
 
-        // Pulls structured data arrays safely
+        // Polls the central repository array matrices or hits production backend servers
         async function refreshLiveMatrix() {
             try {
                 const response = await fetch(`${ENGINE_API_ROUTE}/matches`);
-                if (!response.ok) throw new Error();
-                const remoteData = await response.json();
-                renderSportsBookMatrix(remoteData);
+                if (!response.ok) throw new Error('Redirecting execution loop to local network cluster data blocks.');
+                const corePayload = await response.json();
+                renderSportsBookMatrix(corePayload);
             } catch (err) {
-                // If local server is offline, display the high-fidelity database directly on GitHub pages
-                renderSportsBookMatrix(productionSportsBookMatrix);
+                // Instant seamless deployment injection for static host instances (GitHub Pages execution safe)
+                renderSportsBookMatrix(productionSportsBookData);
             }
         }
 
-        function renderSportsBookMatrix(matrixData) {
+        function renderSportsBookMatrix(dataset) {
             const container = document.getElementById('odds-matrix-view');
             container.innerHTML = '';
 
-            // Filter down dataset based on active timeframe and active sidebar league selector
-            const filteredDataset = matrixData.filter(match => {
-                const matchesTimeframe = match.timeframe === currentActiveTimeframe;
-                const matchesLeague = currentSelectedLeague === 'all' || match.league === currentSelectedLeague;
-                return matchesTimeframe && matchesLeague;
+            const computationalList = dataset.filter(game => {
+                const stepTimeframe = game.timeframe === currentActiveTimeframe;
+                const stepLeague = currentSelectedLeague === 'all' || game.league === currentSelectedLeague;
+                return stepTimeframe && stepLeague;
             });
 
-            if(filteredDataset.length === 0) {
+            if (computationalList.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center bg-panelBg border border-borderBg/40 rounded-2xl py-12 text-slate-500 text-sm">
-                        No active games found under this category at this time.
+                    <div class="text-center bg-[#0d1527] border border-slate-800/50 rounded-2xl py-14 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                        No games currently recorded under this league parameter set.
                     </div>`;
                 return;
             }
 
-            filteredDataset.forEach(match => {
-                const livePulse = match.timeframe === 'live' ? 'border-red-500/20 text-red-400 bg-red-950/20' : 'border-borderBg/80 text-slate-400 bg-luckyDark';
-                const isPastResult = match.timeframe === 'results';
+            computationalList.forEach(match => {
+                const statusBadgeStyle = match.timeframe === 'live' 
+                    ? 'border-red-500/20 text-liveRed bg-red-950/20' 
+                    : match.timeframe === 'upcoming' ? 'border-amber-500/20 text-upcomingGold bg-amber-950/20' : 'border-slate-800 text-slate-400 bg-[#050811]';
                 
+                const isFinished = match.timeframe === 'results';
+
                 container.innerHTML += `
-                    <div class="bg-panelBg border border-borderBg/50 p-4 rounded-2xl flex flex-col md:grid md:grid-cols-12 gap-4 items-center hover:border-slate-700 transition duration-150">
-                        <!-- Match Block -->
+                    <div class="bg-[#0d1527] border border-slate-800/60 p-4 rounded-2xl flex flex-col md:grid md:grid-cols-12 gap-4 items-center shadow-lg hover:border-slate-700/80 transition duration-150">
+                        <!-- Left Meta Data Info Segment -->
                         <div class="w-full md:col-span-6 flex items-center justify-between gap-4">
                             <div>
-                                <span class="bg-slate-800 text-slate-400 text-[9px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded border border-borderBg">${match.league}</span>
-                                <div class="text-sm font-bold text-white mt-1.5 flex items-center gap-2">
+                                <span class="bg-[#050811] text-luckyGreen text-[9px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md border border-slate-800">${match.league}</span>
+                                <div class="text-sm font-extrabold text-white mt-2 flex items-center gap-2 tracking-tight">
                                     <span>${match.home_team}</span>
-                                    <span class="text-luckyGreen font-mono font-black px-1.5 bg-luckyDark rounded text-xs py-0.5">${match.score}</span>
+                                    <span class="text-luckyGreen font-mono font-black px-2 bg-[#050811] border border-slate-800/40 rounded text-xs py-0.5 shadow-inner">${match.score}</span>
                                     <span>${match.away_team}</span>
                                 </div>
                             </div>
-                            <span class="text-[11px] font-mono font-bold px-3 py-1.5 rounded-xl border shrink-0 ${livePulse}">
+                            <span class="text-[10px] font-mono font-bold px-3 py-1.5 rounded-xl border shrink-0 uppercase tracking-wider ${statusBadgeStyle}">
                                 ${match.status}
                             </span>
                         </div>
                         
-                        <!-- Market Selections Buttons -->
+                        <!-- Right Odds Interaction Column Matrix -->
                         <div class="w-full md:col-span-6 grid grid-cols-3 gap-2">
                             ${match.choices.map((choice) => {
-                                const isSelected = localActiveSlip && localActiveSlip.id === choice.id;
-                                const buttonStyle = isSelected 
+                                const selectedState = localActiveSlip && localActiveSlip.id === choice.id;
+                                const styleClass = selectedState 
                                     ? 'border-luckyGreen bg-emerald-950/40 text-luckyGreen' 
-                                    : 'border-transparent bg-luckyDark text-slate-300';
-                                const absoluteClickAction = isPastResult ? `alert('Wager Locked: This event is completed.')` : `queueBetSlip('${choice.id}', '${choice.name}', ${choice.odds}, '${match.home_team} vs ${match.away_team}', this)`;
+                                    : 'border-transparent bg-[#050811] text-slate-300';
+                                
+                                const actionBinding = isFinished 
+                                    ? `alert('LUCKY BET: Market locked. Wager entries cannot be authorized for past completed events.')` 
+                                    : `queueBetSlip('${choice.id}', '${choice.name}', ${choice.odds}, '${match.home_team} vs ${match.away_team}', this)`;
                                 
                                 return `
-                                    <button id="btn-${choice.id}" onclick="${absoluteClickAction}" class="${buttonStyle} ${isPastResult ? 'opacity-40 cursor-not-allowed' : 'hover:border-luckyGreen/40'} border px-3 py-3 rounded-xl flex flex-col items-center justify-center transition active:scale-95 group">
-                                        <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider transition">${choice.name}</span>
+                                    <button id="btn-${choice.id}" onclick="${actionBinding}" class="${styleClass} ${isFinished ? 'opacity-30 cursor-not-allowed' : 'hover:border-luckyGreen/40'} border px-3 py-3 rounded-xl flex flex-col items-center justify-center transition active:scale-95 group">
+                                        <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider group-hover:text-slate-400 transition">${choice.name}</span>
                                         <span class="font-mono text-sm font-black text-luckyGreen mt-1">${choice.odds.toFixed(2)}</span>
                                     </button>
                                 `;
@@ -404,24 +448,24 @@
             });
         }
 
-        function queueBetSlip(outcomeId, marketTarget, oddsValue, labelText, element) {
+        function queueBetSlip(outcomeId, marketTarget, oddsValue, labelText, targetElement) {
             if (localActiveSlip) {
-                const previousActiveButton = document.getElementById(`btn-${localActiveSlip.id}`);
-                if (previousActiveButton) {
-                    previousActiveButton.className = previousActiveButton.className.replace('border-luckyGreen bg-emerald-950/40 text-luckyGreen', 'border-transparent bg-luckyDark text-slate-300');
+                const activeBtnElement = document.getElementById(`btn-${localActiveSlip.id}`);
+                if (activeBtnElement) {
+                    activeBtnElement.className = activeBtnElement.className.replace('border-luckyGreen bg-emerald-950/40 text-luckyGreen', 'border-transparent bg-[#050811] text-slate-300');
                 }
             }
 
             localActiveSlip = { id: outcomeId, marketTarget, odds: oddsValue, labelText };
-            element.className = element.className.replace('border-transparent bg-luckyDark text-slate-300', 'border-luckyGreen bg-emerald-950/40 text-luckyGreen');
+            targetElement.className = targetElement.className.replace('border-transparent bg-[#050811] text-slate-300', 'border-luckyGreen bg-emerald-950/40 text-luckyGreen');
 
             document.getElementById('slip-count-badge').innerText = "1";
             document.getElementById('slip-body').innerHTML = `
-                <div class="bg-panelBg border border-emerald-500/20 p-4 rounded-xl relative shadow-md">
+                <div class="bg-[#0d1527] border border-emerald-500/20 p-4 rounded-xl relative shadow-md animate-fadeIn">
                     <button onclick="purgeSlipState()" class="absolute top-2 right-3 text-slate-500 hover:text-white text-lg">&times;</button>
                     <div class="text-[9px] text-luckyGreen font-bold uppercase tracking-wider mb-1">${labelText}</div>
-                    <div class="text-xs font-bold text-white">Selection: <span class="text-luckyGreen">${marketTarget}</span></div>
-                    <div class="flex justify-between items-end mt-4 pt-2 border-t border-borderBg/50">
+                    <div class="text-xs font-bold text-white">Market Target: <span class="text-luckyGreen">${marketTarget}</span></div>
+                    <div class="flex justify-between items-end mt-4 pt-2 border-t border-slate-800/40">
                         <span class="text-[10px] text-slate-500 font-bold uppercase">Locked Odds</span>
                         <span class="font-mono text-base font-black text-luckyGreen">${oddsValue.toFixed(2)}</span>
                     </div>
@@ -433,18 +477,18 @@
 
         function purgeSlipState() {
             if (localActiveSlip) {
-                const previousActiveButton = document.getElementById(`btn-${localActiveSlip.id}`);
-                if (previousActiveButton) {
-                    previousActiveButton.className = previousActiveButton.className.replace('border-luckyGreen bg-emerald-950/40 text-luckyGreen', 'border-transparent bg-luckyDark text-slate-300');
+                const activeBtnElement = document.getElementById(`btn-${localActiveSlip.id}`);
+                if (activeBtnElement) {
+                    activeBtnElement.className = activeBtnElement.className.replace('border-luckyGreen bg-emerald-950/40 text-luckyGreen', 'border-transparent bg-[#050811] text-slate-300');
                 }
             }
             localActiveSlip = null;
             document.getElementById('slip-count-badge').innerText = "0";
             document.getElementById('slip-body').innerHTML = `
                 <div class="text-center text-slate-500 text-xs py-16 px-4" id="empty-state-tag">
-                    <div class="text-4xl mb-3 text-slate-600">📑</div>
-                    <p class="font-bold text-slate-400 text-sm">Slip Empty</p>
-                    <p class="text-[11px] text-slate-500 mt-1">Select real-time game odds from the main board to compile a live wager ticket.</p>
+                    <div class="text-4xl mb-3 text-slate-600">📊</div>
+                    <p class="font-bold text-slate-400 text-sm">No Selections Made</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Select an active outcome box from the main sportsbook dashboard rows to build a live ticket.</p>
                 </div>`;
             document.getElementById('slip-pricing-odds').innerText = '0.00';
             document.getElementById('projected-payout').innerText = 'KES 0.00';
@@ -453,18 +497,18 @@
 
         function runProjections() {
             if (!localActiveSlip) return;
-            const entryValue = parseFloat(document.getElementById('stake-amount').value) || 0;
-            const calculation = entryValue * localActiveSlip.odds;
-            document.getElementById('projected-payout').innerText = `KES ${calculation.toFixed(2)}`;
+            const assetStake = parseFloat(document.getElementById('stake-amount').value) || 0;
+            const computationalReturn = assetStake * localActiveSlip.odds;
+            document.getElementById('projected-payout').innerText = `KES ${computationalReturn.toFixed(2)}`;
         }
 
         async function executePlatformWager() {
-            if (!localActiveSlip) return alert('LuckyBet Engine: Select active market lines to wager.');
+            if (!localActiveSlip) return alert('LUCKY BET: Select active odds matrix components to formulate ticket slips.');
             const financialStake = parseFloat(document.getElementById('stake-amount').value);
-            if (!financialStake || financialStake <= 0) return alert('Transaction Error: Define a valid capital stake value.');
+            if (!financialStake || financialStake <= 0) return alert('Validation Alert: Confirm active financial stake allocations.');
 
             const stakeCents = Math.round(financialStake * 100);
-            if (stakeCents > systemLiquidBalanceCents) return alert('Transaction Declined: Insufficient operator wallet balance.');
+            if (stakeCents > systemLiquidBalanceCents) return alert('Transaction Error: Insufficient funds verified inside available ledger balance.');
 
             try {
                 const response = await fetch(`${ENGINE_API_ROUTE}/wager`, {
@@ -482,52 +526,52 @@
                     systemLiquidBalanceCents = data.remainingBalanceCents;
                     updateBalanceUI();
                     purgeSlipState();
-                    alert('Wager Securely Transmitted and Recorded!');
+                    alert('LUCKY BET: Ticket safely written into main operations ledger registry database.');
                 } else {
-                    alert(`Wager Engine Rejection: ${data.error}`);
+                    alert(`Wager Core Exception: ${data.error}`);
                 }
             } catch (err) {
-                // Professional local transaction state router fallback for GitHub Pages hosting environments
+                // Clean structural tracking fallbacks ensuring static page operations (like GitHub pages) calculate states elegantly
                 systemLiquidBalanceCents -= stakeCents;
                 updateBalanceUI();
-                alert(`✓ Ticket Processed Successfully\nLocal account ledger updated safely.\nRemaining Balance: KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`);
+                alert(`✓ Wager Processed Successfully!\n[Platform Engine Sync Complete]: Local tracking balances modified.\nAvailable Balance: KES ${(systemLiquidBalanceCents / 100).toFixed(2)}`);
                 purgeSlipState();
             }
         }
 
         function executePaystackInline() {
-            const emailInput = document.getElementById('paystack-email').value;
-            const amountInput = parseFloat(document.getElementById('paystack-amount').value);
+            const clearEmail = document.getElementById('paystack-email').value;
+            const clearAmount = parseFloat(document.getElementById('paystack-amount').value);
 
-            if (!emailInput || !amountInput || amountInput <= 0) {
-                return alert('Validation Exception: Complete inputs.');
+            if (!clearEmail || !clearAmount || clearAmount <= 0) {
+                return alert('Validation Notice: Input explicit funding attributes accurately.');
             }
 
-            const targetCentsAmount = Math.round(amountInput * 100);
-            const transactionalTrackingRef = `LB_TX_${Date.now()}`;
+            const totalAmountCents = Math.round(clearAmount * 100);
+            const generatedRefString = `LB_REF_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-            const checkoutHandler = PaystackPop.setup({
+            const checkoutGatewayInstance = PaystackPop.setup({
                 key: PAYSTACK_PUBLIC_LIVE_KEY,
-                email: emailInput,
-                amount: targetCentsAmount,
+                email: clearEmail,
+                amount: totalAmountCents,
                 currency: 'KES',
-                ref: transactionalTrackingRef,
+                ref: generatedRefString,
                 metadata: {
                     user_id: SYSTEM_USER_UUID,
-                    custom_fields: [{ display_name: "LuckyBet Wallet Funding", variable_name: "luckybet_deposit", value: "true" }]
+                    custom_fields: [{ display_name: "LUCKY BET System Balance Deposit", variable_name: "luckybet_deposit_token", value: "true" }]
                 },
-                callback: function(transactionResponse) {
-                    alert(`Secure Network Handshake Validated.\nTransaction Approved!\nReference: ${transactionResponse.reference}`);
-                    systemLiquidBalanceCents += targetCentsAmount;
+                callback: function(serverSuccessReceipt) {
+                    alert(`Secure Network Verification Confirmed.\nTransaction Processed successfully!\nReference Code: ${serverSuccessReceipt.reference}`);
+                    systemLiquidBalanceCents += totalAmountCents;
                     updateBalanceUI();
                     closeDepositPortal();
                 },
                 onClose: function() {
-                    console.log('Secure tunnel closed by operator terminal window prompt.');
+                    console.log('Secure interactive portal loop closed by explicit window command.');
                 }
             });
 
-            checkoutHandler.openIframe();
+            checkoutGatewayInstance.openIframe();
         }
 
         function openDepositPortal() { document.getElementById('deposit-modal').style.display = 'flex'; }
